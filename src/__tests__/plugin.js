@@ -1,7 +1,7 @@
 /* global test, expect, beforeEach */
 import { resetContext, kea } from 'kea'
 
-import { formsPlugin } from '../index'
+import { formsPlugin } from '../plugin'
 
 beforeEach(() => {
   resetContext({
@@ -11,7 +11,7 @@ beforeEach(() => {
 
 const delay = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms))
 
-describe('kea forms', () => {
+describe('kea-forms plugin', () => {
   test('simple form actions and values', async () => {
     const logic = kea({
       forms: {
@@ -24,12 +24,13 @@ describe('kea forms', () => {
     const unmount = logic.mount()
 
     expect(logic.values.pluginDrawer).toEqual({ name: '', email: '' })
-    expect(Object.keys(logic.values)).toEqual([
+    expect(Object.keys(logic.values).sort()).toEqual([
+      'isPluginDrawerValid',
       'pluginDrawer',
-      'pluginDrawerChanges',
       'pluginDrawerChanged',
-      'pluginDrawerTouches',
+      'pluginDrawerChanges',
       'pluginDrawerTouched',
+      'pluginDrawerTouches',
       'pluginDrawerValidationErrors',
     ])
     expect(Object.keys(logic.actions).sort()).toEqual(['setPluginDrawerValue', 'setPluginDrawerValues'])
@@ -70,9 +71,9 @@ describe('kea forms', () => {
       forms: {
         pluginDrawer: {
           default: { name: '', email: '' },
-          validator: (values) => ({
-            name: !!values.name || 'Please enter a name!',
-            email: !!values.email || 'Please enter an email!',
+          validationErrors: (pluginDrawer) => ({
+            name: !pluginDrawer.name && 'Please enter a name!',
+            email: !pluginDrawer.email && 'Please enter an email!',
           }),
         },
       },
@@ -91,7 +92,7 @@ describe('kea forms', () => {
 
     expect(logic.values.pluginDrawer).toEqual({ name: 'Joe', email: '' })
     expect(logic.values.pluginDrawerValidationErrors).toEqual({
-      name: true,
+      name: false,
       email: 'Please enter an email!',
     })
     expect(logic.values.isPluginDrawerValid).toEqual(false)
@@ -100,8 +101,8 @@ describe('kea forms', () => {
 
     expect(logic.values.pluginDrawer).toEqual({ name: 'Joe', email: 'joe@schmoe.com' })
     expect(logic.values.pluginDrawerValidationErrors).toEqual({
-      name: true,
-      email: true,
+      name: false,
+      email: false,
     })
     expect(logic.values.isPluginDrawerValid).toEqual(true)
 
