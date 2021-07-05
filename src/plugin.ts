@@ -46,7 +46,7 @@ export const formsPlugin = (): KeaPlugin => {
             },
             reducers: {
               [formKey]: [
-                formObject.default || {},
+                formObject.defaults || {},
                 {
                   [`set${capitalizedFormKey}Value`]: (
                     state: Record<string, any>,

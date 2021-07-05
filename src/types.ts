@@ -21,9 +21,9 @@ export type SelectorDefinition<Selectors, SelectorFunction extends any> =
   | [(s: Selectors) => SelectorTuple, SelectorFunction, any]
 
 export interface FormInput<LogicType extends Logic> {
-  default: Record<string, any>
-  validator:
+  defaults?: Record<string, any>
+  validator?:
     | ((formValues: Record<string, any>) => Record<string, any>)
     | SelectorDefinition<LogicType['selectors'], any>
-  submit: (formValues: Record<string, any>) => void | Promise<void>
+  submit?: (formValues: Record<string, any>) => void | Promise<void>
 }
