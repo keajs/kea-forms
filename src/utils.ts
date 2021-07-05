@@ -10,4 +10,3 @@ export function hasErrors(object: any): boolean {
   }
   return !!object
 }
-
