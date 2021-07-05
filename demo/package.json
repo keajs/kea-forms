@@ -25,10 +25,10 @@
   },
   "scripts": {
     "start": "concurrently \"yarn start:cra\" \"yarn start:typegen\" -n CRA,KEA -c blue,green",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject",
-    "start:cra": "react-scripts start",
+    "start:cra": "react-app-rewired start",
     "start:typegen": "kea-typegen watch"
   },
   "eslintConfig": {
@@ -51,6 +51,8 @@
   },
   "devDependencies": {
     "concurrently": "^6.0.2",
-    "kea-typegen": "^1.0.0"
+    "kea-typegen": "^1.0.0",
+    "react-app-rewire-alias": "^1.0.3",
+    "react-app-rewired": "^2.1.8"
   }
 }

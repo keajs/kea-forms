@@ -1,19 +1,18 @@
 import React from 'react'
 import logo from './logo.svg'
 import './App.scss'
+import { Forms } from './forms/Forms'
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a className="App-link" href="https://kea.js.org" target="_blank" rel="noopener noreferrer">
-          Learn Kea
-        </a>
+        <h1>kea-forms demo</h1>
       </header>
+      <div className="App-body">
+        <Forms />
+      </div>
     </div>
   )
 }
