@@ -12,9 +12,19 @@ export interface FormProps {
 }
 
 export interface FieldProps {
-  label: React.ReactNode
-  fieldKey: string
-  children: React.ReactElement
+  label?: React.ReactNode
+  name: string
+  children:
+    | React.ReactElement
+    | (({
+        onChange,
+        value,
+      }: {
+        onChange: (value: any) => void
+        value: any
+        id: string
+        name: string
+      }) => React.ReactElement)
 }
 
 const FormContext = React.createContext({} as { logic: BuiltLogic | undefined; formKey: string })
@@ -23,7 +33,6 @@ export function Form({ logic, props, form, children }: FormProps): JSX.Element {
   const { [`submit${capitalizeFirstLetter(form)}`]: submitForm } = useActions(logic(props))
 
   return (
-    // TODO: measure performance and memoize value
     <FormContext.Provider value={{ logic: logic(props), formKey: form }}>
       <form
         onSubmit={(e) => {
@@ -37,37 +46,45 @@ export function Form({ logic, props, form, children }: FormProps): JSX.Element {
   )
 }
 
-export function Field({ fieldKey, label, children }: FieldProps): JSX.Element {
+export function Field({ name, label, children }: FieldProps): JSX.Element {
   const { logic, formKey } = useContext(FormContext)
   const { [`set${capitalizeFirstLetter(formKey)}Value`]: setValue } = useActions(logic!)
-  const value = useSelector((state) => logic?.selectors[formKey]?.(state)?.[fieldKey])
-  const error = useSelector((state) => logic?.selectors[`${formKey}Errors`]?.(state)?.[fieldKey])
+  const value = useSelector((state) => logic?.selectors[formKey]?.(state)?.[name])
+  const error = useSelector((state) => logic?.selectors[`${formKey}Errors`]?.(state)?.[name])
+  const id = `${logic?.pathString}.${formKey}.${name}`
 
-  const id = `${logic?.pathString}.${formKey}.${fieldKey}`
+  const newProps = {
+    id,
+    name,
+    value,
+    onChange: (c: string) => setValue(name, c),
+  }
 
-  const kids = React.Children.map(children, (child) => {
-    const isHTMLInputElement = child.type === 'input' || child.type === 'select'
-    if (isHTMLInputElement) {
-      return React.cloneElement(child, {
-        id,
-        name: fieldKey,
-        ...child.props,
-        value: value || '',
-        onChange: (e: Event) => setValue(fieldKey, (e?.target as HTMLInputElement)?.value),
-      })
-    } else {
-      return React.cloneElement(child, {
-        id,
-        ...child.props,
-        value,
-        onChange: (c: any) => setValue(fieldKey, c),
-      })
-    }
-  })
+  let kids
+  if (typeof children === 'function') {
+    // function as children
+    kids = children(newProps)
+  } else if (children) {
+    const props =
+      children.type === 'input' || children.type === 'select'
+        ? {
+            // <input> or <select>
+            ...newProps,
+            value: value || '', // pass default "" for <input />
+            onChange: (e: Event) => setValue(name, (e?.target as HTMLInputElement)?.value), // e.target.value
+            ...children.props,
+          }
+        : {
+            // other dom or react element
+            ...newProps,
+            ...children.props,
+          }
+    kids = React.cloneElement(children, props)
+  }
 
   return (
     <div className="form-input-container">
-      <label htmlFor={id}>{label}</label>
+      {label ? <label htmlFor={id}>{label}</label> : null}
       {kids}
       {error ? <div className="form-error">{error}</div> : null}
     </div>
