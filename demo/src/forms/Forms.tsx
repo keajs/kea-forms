@@ -27,6 +27,14 @@ export function Forms() {
         <Field fieldKey="email" label="Email">
           <Input className="form-input" />
         </Field>
+        <Field fieldKey="guest" label="Guest name">
+          <select>
+            <option value='' />
+            <option value='My Name'>My Name</option>
+            <option value='Other Name'>Other Name</option>
+            <option value='Lolz'>Lolz</option>
+          </select>
+        </Field>
         <div>
           <input type="submit" value={isUserFormSubmitting ? '... ' : 'Submit Form!'} className="form-submit" />
         </div>

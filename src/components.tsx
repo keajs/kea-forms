@@ -57,6 +57,7 @@ export function Field({ fieldKey, label, children }: FieldProps): JSX.Element {
       })
     } else {
       return React.cloneElement(child, {
+        id,
         ...child.props,
         value,
         onChange: (c: any) => setValue(fieldKey, c),
