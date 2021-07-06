@@ -16,7 +16,8 @@ import { capitalizeFirstLetter, hasErrors } from './utils'
 // - pluginDrawerChanged = true
 // - pluginDrawerTouches = { enabled: true }
 // - pluginDrawerTouched = true
-// - ${formKey}ValidationErrors
+// - pluginDrawerValidationErrors
+// - pluginDrawerErrors
 // - isPluginDrawerSubmitting
 // - pluginDrawerHasErrors
 // - canSubmitPluginDrawer
@@ -45,6 +46,8 @@ export const formsPlugin = (): KeaPlugin => {
               [`set${capitalizedFormKey}Values`]: (values: Record<string, any>) => ({ values }),
               [`submit${capitalizedFormKey}`]: true,
               [`submit${capitalizedFormKey}Request`]: (formValues: Record<string, any>) => ({ [formKey]: formValues }),
+              [`submit${capitalizedFormKey}Success`]: (formValues: Record<string, any>) => ({ [formKey]: formValues }),
+              [`submit${capitalizedFormKey}Failure`]: (error: Error) => ({ error }),
             },
             reducers: {
               [formKey]: [
@@ -58,6 +61,14 @@ export const formsPlugin = (): KeaPlugin => {
                     state: Record<string, any>,
                     { values }: { values: Record<string, any> },
                   ) => ({ ...state, ...values }),
+                },
+              ],
+              [`is${capitalizedFormKey}Submitting`]: [
+                false,
+                {
+                  [`submit${capitalizedFormKey}Request`]: () => true,
+                  [`submit${capitalizedFormKey}Success`]: () => false,
+                  [`submit${capitalizedFormKey}Failure`]: () => false,
                 },
               ],
             },
@@ -75,6 +86,11 @@ export const formsPlugin = (): KeaPlugin => {
               [`${formKey}ValidationErrors`]: Array.isArray(formObject.validator)
                 ? formObject.validator
                 : [(s) => [s[formKey]], formObject.validator],
+              [`${formKey}Errors`]: [
+                // TODO: if showErrors
+                (s) => [s[`${formKey}ValidationErrors`]],
+                (errors: Record<string, any>) => errors,
+              ],
               [`is${capitalizedFormKey}Valid`]: [
                 (s) => [s[`${formKey}ValidationErrors`]],
                 (errors: Record<string, any>) => !hasErrors(errors),
@@ -83,13 +99,23 @@ export const formsPlugin = (): KeaPlugin => {
             listeners: ({ actions, values }) => ({
               [`submit${capitalizedFormKey}`]: () => {
                 // TODO: if canSubmit
-                actions[`submit${capitalizedFormKey}Request`](values[formKey])
+                const canSubmit = true
+                if (canSubmit) {
+                  actions[`submit${capitalizedFormKey}Request`](values[formKey])
+                } else {
+                  actions[`submit${capitalizedFormKey}Failure`](new Error('Validation error'))
+                }
               },
               [`submit${capitalizedFormKey}Request`]: async (
                 { [formKey]: formValues }: Record<string, any>,
                 breakpoint: BreakPointFunction,
               ) => {
-                await formObject.submit?.(formValues, breakpoint)
+                try {
+                  await formObject.submit?.(formValues, breakpoint)
+                  actions[`submit${capitalizedFormKey}Success`](formValues)
+                } catch (error) {
+                  actions[`submit${capitalizedFormKey}Failure`](error)
+                }
               },
             }),
           })

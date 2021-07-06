@@ -133,10 +133,12 @@ describe('kea-forms plugin', () => {
     logic.actions.setPluginDrawerValues({ name: 'hello world' })
     expect(logic.values.pluginDrawer).toEqual({ name: 'hello world' })
     logic.actions.submitPluginDrawer()
+    expect(logic.values.isPluginDrawerSubmitting).toEqual(true)
 
     await delay(200)
 
     expect(submitRan).toEqual(true)
+    expect(logic.values.isPluginDrawerSubmitting).toEqual(false)
 
     unmount()
   })
