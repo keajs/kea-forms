@@ -23,6 +23,9 @@ export const formsLogic = kea<formsLogicType>({
           ? 'Please enter a valid email'
           : null,
       }),
+      submit: () => {
+        console.log('submitting!')
+      }
     },
   } as FormInput<any>,
 })

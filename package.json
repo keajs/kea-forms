@@ -57,7 +57,6 @@
     "@babel/preset-typescript": "^7.14.5",
     "@types/jest": "^24.0.25",
     "@types/mocha": "^5.2.7",
-    "@types/react": "^17.0.13",
     "@types/react-redux": "^7.1.9",
     "@typescript-eslint/eslint-plugin": "^4.28.2",
     "@typescript-eslint/parser": "^4.28.2",
