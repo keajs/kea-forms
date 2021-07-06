@@ -14,7 +14,7 @@ export interface FormProps {
 export interface FieldProps {
   label: React.ReactNode
   fieldKey: string
-  children: React.ReactNode
+  children: React.ReactElement
 }
 
 const FormContext = React.createContext({} as { logic: BuiltLogic | undefined; formKey: string })
@@ -37,22 +37,37 @@ export function Form({ logic, props, form, children }: FormProps): JSX.Element {
   )
 }
 
-export function Field({ fieldKey, label }: FieldProps): JSX.Element {
+export function Field({ fieldKey, label, children }: FieldProps): JSX.Element {
   const { logic, formKey } = useContext(FormContext)
-  const setValueText = `set${capitalizeFirstLetter(formKey)}Value`
-  const { [setValueText]: setValue } = useActions(logic!)
+  const { [`set${capitalizeFirstLetter(formKey)}Value`]: setValue } = useActions(logic!)
   const value = useSelector((state) => logic?.selectors[formKey]?.(state)?.[fieldKey])
   const error = useSelector((state) => logic?.selectors[`${formKey}Errors`]?.(state)?.[fieldKey])
 
+  const id = `${logic?.pathString}.${formKey}.${fieldKey}`
+
+  const kids = React.Children.map(children, (child) => {
+    const isHTMLInputElement = child.type === 'input' || child.type === 'select'
+    if (isHTMLInputElement) {
+      return React.cloneElement(child, {
+        id,
+        name: fieldKey,
+        ...child.props,
+        value: value || '',
+        onChange: (e: Event) => setValue(fieldKey, (e?.target as HTMLInputElement)?.value),
+      })
+    } else {
+      return React.cloneElement(child, {
+        ...child.props,
+        value,
+        onChange: (c: any) => setValue(fieldKey, c),
+      })
+    }
+  })
+
   return (
     <div className="form-input-container">
-      <label htmlFor={`${logic?.pathString}.${formKey}.${fieldKey}`}>{label}</label>
-      <input
-        className="form-input"
-        id={`${logic?.pathString}.${formKey}.${fieldKey}`}
-        value={value}
-        onChange={(e) => setValue(fieldKey, e.target.value)}
-      />
+      <label htmlFor={id}>{label}</label>
+      {kids}
       {error ? <div className="form-error">{error}</div> : null}
     </div>
   )
