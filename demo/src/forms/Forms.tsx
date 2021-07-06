@@ -1,5 +1,7 @@
+import './forms.scss'
 import { formsLogic, UserFormType } from './formsLogic'
 import { useActions, useValues } from 'kea'
+import { Form } from 'kea-forms'
 
 export function Forms() {
   const { userForm, userFormValidationErrors } = useValues(formsLogic) as {
@@ -13,25 +15,25 @@ export function Forms() {
   return (
     <div>
       <p>Demonstrating a simple form below</p>
-      <form onSubmit={() => {}}>
-        <div>
+      <Form logic={formsLogic} form='userForm'>
+        <div className='form-input-container'>
           <label htmlFor='userForm.name'>
             Name
           </label>
-          <input id='userForm.name' value={userForm.name} onChange={(e) => setUserFormValue('name', e.target.value)} />
-          {userFormValidationErrors?.name ? <div>{userFormValidationErrors?.name}</div> : null}
+          <input className='form-input' id='userForm.name' value={userForm.name} onChange={(e) => setUserFormValue('name', e.target.value)} />
+          {userFormValidationErrors?.name ? <div className='form-error'>{userFormValidationErrors?.name}</div> : null}
         </div>
-        <div>
+        <div className='form-input-container'>
           <label htmlFor='userForm.email'>
             Email
           </label>
-          <input id='userForm.email' value={userForm.email} onChange={(e) => setUserFormValue('email', e.target.value)} />
-          {userFormValidationErrors?.email ? <div>{userFormValidationErrors?.email}</div> : null}
+          <input className='form-input' id='userForm.email' value={userForm.email} onChange={(e) => setUserFormValue('email', e.target.value)} />
+          {userFormValidationErrors?.email ? <div className='form-error'>{userFormValidationErrors?.email}</div> : null}
         </div>
         <div>
-          <input type='submit' value='Submit Form!' />
+          <input type='submit' value='Submit Form!' className='form-submit' />
         </div>
-      </form>
+      </Form>
     </div>
   )
 }

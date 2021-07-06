@@ -6,7 +6,6 @@ import reportWebVitals from './reportWebVitals'
 import { Provider, resetContext } from 'kea'
 import { routerPlugin } from 'kea-router'
 import { loadersPlugin } from 'kea-loaders'
-// @ts-ignore
 import { formsPlugin } from 'kea-forms'
 
 resetContext({

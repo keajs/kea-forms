@@ -11,6 +11,7 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "kea": "^2.4.3",
+    "kea-forms": "file:../src",
     "kea-loaders": "^0.4.0",
     "kea-router": "^0.5.3",
     "react": "^17.0.2",

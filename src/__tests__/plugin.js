@@ -16,7 +16,7 @@ describe('kea-forms plugin', () => {
     const logic = kea({
       forms: {
         pluginDrawer: {
-          default: { name: '', email: '' },
+          defaults: { name: '', email: '' },
         },
       },
     })
@@ -33,7 +33,11 @@ describe('kea-forms plugin', () => {
       'pluginDrawerTouches',
       'pluginDrawerValidationErrors',
     ])
-    expect(Object.keys(logic.actions).sort()).toEqual(['setPluginDrawerValue', 'setPluginDrawerValues'])
+    expect(Object.keys(logic.actions).sort()).toEqual([
+      'setPluginDrawerValue',
+      'setPluginDrawerValues',
+      'submitPluginDrawer',
+    ])
 
     logic.actions.setPluginDrawerValue('name', 'John')
     expect(logic.values.pluginDrawer).toEqual({ name: 'John', email: '' })
@@ -54,7 +58,7 @@ describe('kea-forms plugin', () => {
       connect: [otherLogic],
       forms: {
         pluginDrawer: {
-          default: (state) => ({ name: otherLogic.selectors.myData(state) }),
+          defaults: (state) => ({ name: otherLogic.selectors.myData(state) }),
         },
       },
     })
@@ -70,8 +74,8 @@ describe('kea-forms plugin', () => {
     const logic = kea({
       forms: {
         pluginDrawer: {
-          default: { name: '', email: '' },
-          validationErrors: (pluginDrawer) => ({
+          defaults: { name: '', email: '' },
+          validator: (pluginDrawer) => ({
             name: !pluginDrawer.name && 'Please enter a name!',
             email: !pluginDrawer.email && 'Please enter an email!',
           }),

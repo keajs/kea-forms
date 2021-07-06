@@ -43,6 +43,7 @@ export const formsPlugin = (): KeaPlugin => {
             actions: {
               [`set${capitalizedFormKey}Value`]: (key: string, value: any) => ({ values: { [key]: value } }),
               [`set${capitalizedFormKey}Values`]: (values: Record<string, any>) => ({ values }),
+              [`submit${capitalizedFormKey}`]: true,
             },
             reducers: {
               [formKey]: [

@@ -14,8 +14,8 @@
   },
   "homepage": "https://github.com/keajs/kea-forms#readme",
   "scripts": {
-    "build": "rollup -c",
-    "watch": "rollup -cw",
+    "build": "tsc -b",
+    "watch": "tsc -w",
     "lint": "eslint src/**",
     "prepublishOnly": "npm run test && npm run build",
     "start": "npm run watch",
@@ -23,7 +23,11 @@
   },
   "files": [
     "lib",
-    "src"
+    "src",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE.md",
+    "tsconfig.json"
   ],
   "peerDependencies": {
     "kea": ">= 2.3.7"
@@ -53,15 +57,13 @@
     "@babel/preset-typescript": "^7.14.5",
     "@types/jest": "^24.0.25",
     "@types/mocha": "^5.2.7",
-    "@types/react": "^16.9.43",
+    "@types/react": "^17.0.13",
     "@types/react-redux": "^7.1.9",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.0.1",
     "babel-plugin-transform-babel-env-inline": "^0.0.1",
     "cross-env": "^5.2.0",
-    "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.2",
     "eslint": "^7.30.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.23.4",
@@ -71,21 +73,15 @@
     "eslint-plugin-react": "^7.24.0",
     "jest": "^26.0.1",
     "jest-environment-node-debug": "^2.0.0",
-    "jsdom": "^16.2.2",
-    "kea": "^2.3.7",
+    "kea": "^2.4.5",
     "prettier": "^2.3.2",
     "prop-types": "^15.7.2",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-redux": "^7.2.0",
-    "react-test-renderer": "^16.13.1",
+    "react-test-renderer": "^17.0.2",
     "redux": "^4.0.5",
     "reselect": "^4.0.0",
-    "rollup": "^2.52.7",
-    "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-typescript2": "^0.30.0",
     "typescript": "^4.3.5"
   }
 }

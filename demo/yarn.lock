@@ -6855,6 +6855,9 @@ jsprim@^1.2.2:
     array-includes "^3.1.2"
     object.assign "^4.1.2"
 
+"kea-forms@file:../src":
+  version "0.0.0"
+
 kea-loaders@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/kea-loaders/-/kea-loaders-0.4.0.tgz#4639dda7b213e45fe1276ec63f53fb4e8b4ee9fc"

@@ -4,8 +4,8 @@
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "ESNext",
-    "module": "ESNext",
+    "target": "ES5",
+    "module": "CommonJS",
     "strict": true,
     "sourceMap": true,
     "outDir": "./lib",
@@ -16,7 +16,8 @@
     "resolveJsonModule": false,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "jsx": "react"
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx"
   },
-  "exclude": ["node_modules", "lib"]
+  "exclude": ["node_modules", "lib", "demo"]
 }
