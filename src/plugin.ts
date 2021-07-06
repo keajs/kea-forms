@@ -1,4 +1,4 @@
-import { KeaPlugin, Logic } from 'kea'
+import { BreakPointFunction, KeaPlugin, Logic } from 'kea'
 import { FormInput } from './types'
 import { capitalizeFirstLetter, hasErrors } from './utils'
 
@@ -44,6 +44,7 @@ export const formsPlugin = (): KeaPlugin => {
               [`set${capitalizedFormKey}Value`]: (key: string, value: any) => ({ values: { [key]: value } }),
               [`set${capitalizedFormKey}Values`]: (values: Record<string, any>) => ({ values }),
               [`submit${capitalizedFormKey}`]: true,
+              [`submit${capitalizedFormKey}Request`]: (formValues: Record<string, any>) => ({ [formKey]: formValues }),
             },
             reducers: {
               [formKey]: [
@@ -79,6 +80,18 @@ export const formsPlugin = (): KeaPlugin => {
                 (errors: Record<string, any>) => !hasErrors(errors),
               ],
             },
+            listeners: ({ actions, values }) => ({
+              [`submit${capitalizedFormKey}`]: () => {
+                // TODO: if canSubmit
+                actions[`submit${capitalizedFormKey}Request`](values[formKey])
+              },
+              [`submit${capitalizedFormKey}Request`]: async (
+                { [formKey]: formValues }: Record<string, any>,
+                breakpoint: BreakPointFunction,
+              ) => {
+                await formObject.submit?.(formValues, breakpoint)
+              },
+            }),
           })
         })
       },

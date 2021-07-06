@@ -37,6 +37,7 @@ describe('kea-forms plugin', () => {
       'setPluginDrawerValue',
       'setPluginDrawerValues',
       'submitPluginDrawer',
+      'submitPluginDrawerRequest',
     ])
 
     logic.actions.setPluginDrawerValue('name', 'John')
@@ -109,6 +110,33 @@ describe('kea-forms plugin', () => {
       email: false,
     })
     expect(logic.values.isPluginDrawerValid).toEqual(true)
+
+    unmount()
+  })
+
+  test('submit', async () => {
+    let submitRan = false
+    const logic = kea({
+      forms: {
+        pluginDrawer: {
+          defaults: { name: '' },
+          submit: async (formValues, breakpoint) => {
+            await breakpoint(100)
+            expect(formValues).toEqual({ name: 'hello world' })
+            submitRan = true
+          },
+        },
+      },
+    })
+
+    const unmount = logic.mount()
+    logic.actions.setPluginDrawerValues({ name: 'hello world' })
+    expect(logic.values.pluginDrawer).toEqual({ name: 'hello world' })
+    logic.actions.submitPluginDrawer()
+
+    await delay(200)
+
+    expect(submitRan).toEqual(true)
 
     unmount()
   })

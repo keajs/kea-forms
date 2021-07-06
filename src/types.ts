@@ -1,5 +1,5 @@
 // TDDO: use the one from Kea directly
-import { Logic, Selector } from 'kea'
+import { BreakPointFunction, Logic, Selector } from 'kea'
 
 type SelectorTuple =
   | []
@@ -25,5 +25,5 @@ export interface FormInput<LogicType extends Logic> {
   validator?:
     | ((formValues: Record<string, any>) => Record<string, any>)
     | SelectorDefinition<LogicType['selectors'], any>
-  submit?: (formValues: Record<string, any>) => void | Promise<void>
+  submit?: (formValues: Record<string, any>, breakpoint: BreakPointFunction) => void | Promise<void>
 }
