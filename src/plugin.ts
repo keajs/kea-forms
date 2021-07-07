@@ -103,10 +103,10 @@ export const formsPlugin = (): KeaPlugin => {
               ],
               [`${formKey}ValidationErrors`]: Array.isArray(formObject.validator)
                 ? formObject.validator
-                : [(s) => [s[formKey]], formObject.validator],
+                : [(s) => [s[formKey]], formObject.validator || (() => ({}))],
               [`${formKey}HasErrors`]: [
                 (s) => [s[`${formKey}ValidationErrors`]],
-                (errors: Record<string, any>) => !!Object.values(errors).find((a) => !!a),
+                (validationErrors: Record<string, any>) => !!Object.values(validationErrors).find((a) => !!a),
               ],
               [`${formKey}Errors`]: [
                 (s) => [s[`${formKey}ValidationErrors`], s[`show${capitalizedFormKey}Errors`], s[`${formKey}Touches`]],

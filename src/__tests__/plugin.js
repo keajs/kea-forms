@@ -25,19 +25,27 @@ describe('kea-forms plugin', () => {
 
     expect(logic.values.pluginDrawer).toEqual({ name: '', email: '' })
     expect(Object.keys(logic.values).sort()).toEqual([
+      'isPluginDrawerSubmitting',
       'isPluginDrawerValid',
       'pluginDrawer',
       'pluginDrawerChanged',
       'pluginDrawerChanges',
+      'pluginDrawerErrors',
+      'pluginDrawerHasErrors',
       'pluginDrawerTouched',
       'pluginDrawerTouches',
       'pluginDrawerValidationErrors',
+      'showPluginDrawerErrors',
     ])
     expect(Object.keys(logic.actions).sort()).toEqual([
+      'resetPluginDrawer',
       'setPluginDrawerValue',
       'setPluginDrawerValues',
       'submitPluginDrawer',
+      'submitPluginDrawerFailure',
       'submitPluginDrawerRequest',
+      'submitPluginDrawerSuccess',
+      'touchPluginDrawerField',
     ])
 
     logic.actions.setPluginDrawerValue('name', 'John')
