@@ -14,6 +14,7 @@ export interface FormProps {
 export interface FieldProps {
   label?: React.ReactNode
   name: string
+  noStyle?: boolean
   children:
     | React.ReactElement
     | (({
@@ -46,10 +47,15 @@ export function Form({ logic, props, form, children }: FormProps): JSX.Element {
   )
 }
 
-export function Field({ name, label, children }: FieldProps): JSX.Element {
+export function Field({ name, label, noStyle, children }: FieldProps): JSX.Element {
   const { logic, formKey } = useContext(FormContext)
+  if (!logic) {
+    throw new Error('Please pass a logic to the <Form /> tag.')
+  }
   const capitalizedFormKey = capitalizeFirstLetter(formKey)
-  const { [`set${capitalizedFormKey}Value`]: setValue, [`touch${capitalizedFormKey}Field`]: touchField } = useActions(logic!)
+  const { [`set${capitalizedFormKey}Value`]: setValue, [`touch${capitalizedFormKey}Field`]: touchField } = useActions(
+    logic,
+  )
   const value = useSelector((state) => logic?.selectors[formKey]?.(state)?.[name])
   const error = useSelector((state) => logic?.selectors[`${formKey}Errors`]?.(state)?.[name])
   const id = `${logic?.pathString}.${formKey}.${name}`
@@ -82,6 +88,12 @@ export function Field({ name, label, children }: FieldProps): JSX.Element {
             ...children.props,
           }
     kids = React.cloneElement(children, props)
+  } else {
+    kids = <></>
+  }
+
+  if (noStyle) {
+    return kids
   }
 
   return (
