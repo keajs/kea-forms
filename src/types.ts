@@ -26,4 +26,7 @@ export interface FormInput<LogicType extends Logic> {
     | ((formValues: Record<string, any>) => Record<string, any>)
     | SelectorDefinition<LogicType['selectors'], any>
   submit?: (formValues: Record<string, any>, breakpoint: BreakPointFunction) => void | Promise<void>
+  options?: {
+    showErrorsOnTouch: boolean
+  }
 }

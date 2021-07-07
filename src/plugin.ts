@@ -38,12 +38,15 @@ export const formsPlugin = (): KeaPlugin => {
         const forms = typeof input.forms === 'function' ? input.forms(logic) : input.forms
 
         Object.entries(forms as Record<string, FormInput<Logic>>).forEach(([formKey, formObject]) => {
+          const { showErrorsOnTouch } = formObject.options || {}
           const capitalizedFormKey = capitalizeFirstLetter(formKey)
 
           logic.extend({
             actions: {
               [`set${capitalizedFormKey}Value`]: (key: string, value: any) => ({ values: { [key]: value } }),
               [`set${capitalizedFormKey}Values`]: (values: Record<string, any>) => ({ values }),
+              [`touch${capitalizedFormKey}Field`]: (field: string) => ({ field }),
+              [`reset${capitalizedFormKey}`]: true,
               [`submit${capitalizedFormKey}`]: true,
               [`submit${capitalizedFormKey}Request`]: (formValues: Record<string, any>) => ({ [formKey]: formValues }),
               [`submit${capitalizedFormKey}Success`]: (formValues: Record<string, any>) => ({ [formKey]: formValues }),
@@ -71,6 +74,22 @@ export const formsPlugin = (): KeaPlugin => {
                   [`submit${capitalizedFormKey}Failure`]: () => false,
                 },
               ],
+              [`show${capitalizedFormKey}Errors`]: [
+                false,
+                {
+                  [`submit${capitalizedFormKey}`]: () => true,
+                  [`submit${capitalizedFormKey}Success`]: () => false,
+                  [`submit${capitalizedFormKey}Failure`]: () => true,
+                },
+              ],
+              [`${formKey}Touches`]: [
+                {} as Record<string, boolean>,
+                {
+                  [`reset${capitalizedFormKey}`]: () => ({}),
+                  [`touch${capitalizedFormKey}Field`]: (state: Record<string, boolean>, { field }: { field: string }) =>
+                    field in state ? state : { ...state, [field]: true },
+                },
+              ],
             },
             selectors: {
               [`${formKey}Changes`]: [(s) => [], () => []],
@@ -78,7 +97,6 @@ export const formsPlugin = (): KeaPlugin => {
                 (s) => [s[`${formKey}Changes`]],
                 (changes: Record<string, any>) => Object.keys(changes).length > 0,
               ],
-              [`${formKey}Touches`]: [(s) => [], () => []],
               [`${formKey}Touched`]: [
                 (s) => [s[`${formKey}Touches`]],
                 (touches: Record<string, any>) => Object.keys(touches).length > 0,
@@ -86,10 +104,18 @@ export const formsPlugin = (): KeaPlugin => {
               [`${formKey}ValidationErrors`]: Array.isArray(formObject.validator)
                 ? formObject.validator
                 : [(s) => [s[formKey]], formObject.validator],
-              [`${formKey}Errors`]: [
-                // TODO: if showErrors
+              [`${formKey}HasErrors`]: [
                 (s) => [s[`${formKey}ValidationErrors`]],
-                (errors: Record<string, any>) => errors,
+                (errors: Record<string, any>) => !!Object.values(errors).find((a) => !!a),
+              ],
+              [`${formKey}Errors`]: [
+                (s) => [s[`${formKey}ValidationErrors`], s[`show${capitalizedFormKey}Errors`], s[`${formKey}Touches`]],
+                (errors: Record<string, any>, showErrors: boolean, touches: Record<string, boolean>) =>
+                  showErrors
+                    ? errors
+                    : showErrorsOnTouch
+                    ? Object.fromEntries(Object.entries(errors).filter(([key]) => touches[key]))
+                    : {},
               ],
               [`is${capitalizedFormKey}Valid`]: [
                 (s) => [s[`${formKey}ValidationErrors`]],
@@ -98,8 +124,7 @@ export const formsPlugin = (): KeaPlugin => {
             },
             listeners: ({ actions, values }) => ({
               [`submit${capitalizedFormKey}`]: () => {
-                // TODO: if canSubmit
-                const canSubmit = true
+                const canSubmit = !values[`${formKey}HasErrors`]
                 if (canSubmit) {
                   actions[`submit${capitalizedFormKey}Request`](values[formKey])
                 } else {

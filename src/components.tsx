@@ -48,7 +48,8 @@ export function Form({ logic, props, form, children }: FormProps): JSX.Element {
 
 export function Field({ name, label, children }: FieldProps): JSX.Element {
   const { logic, formKey } = useContext(FormContext)
-  const { [`set${capitalizeFirstLetter(formKey)}Value`]: setValue } = useActions(logic!)
+  const capitalizedFormKey = capitalizeFirstLetter(formKey)
+  const { [`set${capitalizedFormKey}Value`]: setValue, [`touch${capitalizedFormKey}Field`]: touchField } = useActions(logic!)
   const value = useSelector((state) => logic?.selectors[formKey]?.(state)?.[name])
   const error = useSelector((state) => logic?.selectors[`${formKey}Errors`]?.(state)?.[name])
   const id = `${logic?.pathString}.${formKey}.${name}`
@@ -58,6 +59,7 @@ export function Field({ name, label, children }: FieldProps): JSX.Element {
     name,
     value,
     onChange: (c: string) => setValue(name, c),
+    onBlur: () => touchField(name),
   }
 
   let kids
