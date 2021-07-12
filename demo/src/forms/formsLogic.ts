@@ -1,6 +1,5 @@
-import {BreakPointFunction, kea} from 'kea'
+import { kea } from 'kea'
 import { formsLogicType } from './formsLogicType'
-import { FormInput } from 'kea-forms'
 import { validateEmail } from './utils'
 
 export interface UserFormType {
@@ -8,14 +7,14 @@ export interface UserFormType {
   email: string
 }
 
-export const formsLogic = kea<formsLogicType>({
+export const formsLogic = kea<formsLogicType<UserFormType>>({
   forms: {
     userForm: {
       defaults: {
         name: '',
         email: '',
       } as UserFormType,
-      validator: (values: UserFormType) => ({
+      validator: (values) => ({
         name: !values.name && 'Please enter a name',
         email: !values.email
           ? 'Please enter an email'
@@ -23,10 +22,9 @@ export const formsLogic = kea<formsLogicType>({
           ? 'Please enter a valid email'
           : null,
       }),
-      submit: async (formValues: Record<string, any>, breakpoint: BreakPointFunction) => {
+      submit: (formValues) => {
         console.log('submitting!', formValues)
-        await breakpoint(1000)
-      }
+      },
     },
-  } as FormInput<any>,
+  },
 })

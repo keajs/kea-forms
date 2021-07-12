@@ -3,14 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
-    "@types/jest": "^26.0.15",
-    "@types/node": "^12.0.0",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
-    "kea": "^2.4.3",
+    "kea": "^2.4.6",
     "kea-forms": "file:../lib",
     "kea-loaders": "^0.4.0",
     "kea-router": "^0.5.3",
@@ -21,8 +14,19 @@
     "redux": "^4.1.0",
     "reselect": "^4.0.0",
     "sass": "^1.35.1",
-    "typescript": "^4.3.4",
     "web-vitals": "^1.0.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^12.0.0",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "concurrently": "^6.0.2",
+    "kea-typegen": "^1.1.3",
+    "typescript": "^4.3.4"
   },
   "scripts": {
     "start": "concurrently \"yarn start:cra\" \"yarn start:typegen\" -n CRA,KEA -c blue,green",
@@ -49,9 +53,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "concurrently": "^6.0.2",
-    "kea-typegen": "^1.0.0"
   }
 }

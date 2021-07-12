@@ -13,9 +13,7 @@ function Input({ onChange, value, ...props }: InputProps): JSX.Element {
 }
 
 export function Forms() {
-  const { isUserFormSubmitting } = useValues(formsLogic) as {
-    isUserFormSubmitting: boolean
-  }
+  const { isUserFormSubmitting } = useValues(formsLogic)
 
   return (
     <div>
