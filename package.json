@@ -1,6 +1,6 @@
 {
   "name": "kea-forms",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Form helpers for Kea",
   "author": "Marius Andra",
   "license": "MIT",
