@@ -67,7 +67,7 @@ export const formsLogic = kea<formsLogicType<UserFormType>>({
 Produces the following actions and values:
 
 ```ts
-interface fomrsLogicType {
+interface formsLogicType {
   actions: {
     setUserFormValue: (key: string, value: any) => void
     setUserFormValues: (values: Partial<UserFormType>) => void
