@@ -13,6 +13,14 @@ const recordStringAny = () =>
     ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
   ])
 
+const bool = () => ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword)
+const string = () => ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
+const partial = (node: ts.TypeNode) => ts.createTypeReferenceNode(ts.createIdentifier('Partial'), [node])
+const deepPartial = (node: ts.TypeNode) => ts.createTypeReferenceNode(ts.createIdentifier('DeepPartial'), [node])
+const deepPartialMap = (node: ts.TypeNode, mapTo: ts.TypeNode) =>
+  ts.createTypeReferenceNode(ts.createIdentifier('DeepPartialMap'), [node, mapTo])
+const validationErrorType = () => ts.createTypeReferenceNode(ts.createIdentifier('ValidationErrorType'), undefined)
+
 export default {
   visitKeaProperty({ name, parsedLogic, node, getTypeNodeForNode, prepareForPrint }) {
     if (name === 'forms') {
@@ -42,14 +50,13 @@ export default {
       // get type of `default` and prepare it for printing
       if (ts.isObjectLiteralExpression(node)) {
         for (const property of node.properties) {
-          const name = property.name?.getText()
+          const formKey = property.name?.getText()
 
-          if (!name || !ts.isPropertyAssignment(property) || !ts.isObjectLiteralExpression(property.initializer)) {
+          if (!formKey || !ts.isPropertyAssignment(property) || !ts.isObjectLiteralExpression(property.initializer)) {
             continue
           }
 
-          // get type of `defaults`
-
+          /** Type of the form */
           let typeNode: ts.TypeNode | null = null
           const defaultsProp = property.initializer.properties.find((prop) => prop.name?.getText() === 'defaults')
 
@@ -62,35 +69,186 @@ export default {
             typeNode = recordStringAny()
           }
 
-          const capitalizedName = capitalizeFirstLetter(name)
+          const capitalizedFormKey = capitalizeFirstLetter(formKey)
+
+          // add deps
+          if (!parsedLogic.typeReferencesToImportFromFiles['node_modules/kea-forms']) {
+            parsedLogic.typeReferencesToImportFromFiles['node_modules/kea-forms'] = new Set()
+          }
+          parsedLogic.typeReferencesToImportFromFiles['node_modules/kea-forms'].add('DeepPartial')
+          parsedLogic.typeReferencesToImportFromFiles['node_modules/kea-forms'].add('DeepPartialMap')
+          parsedLogic.typeReferencesToImportFromFiles['node_modules/kea-forms'].add('ValidationErrorType')
 
           // add actions
 
-          const createAction = (name: string) => {
+          const createAction = (
+            name: string,
+            parameters: ts.ParameterDeclaration[] = [],
+            returnTypeNode: ts.TypeNode | null = null,
+          ) => {
             // add action "submitForm" to parsedLogic
             parsedLogic.actions.push({
               name,
-              parameters: [],
-              returnTypeNode: ts.createTypeLiteralNode([
-                ts.createPropertySignature(
-                  undefined,
-                  ts.createIdentifier('value'),
-                  undefined,
-                  ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
-                  undefined,
-                ),
-              ]),
+              parameters,
+              returnTypeNode:
+                returnTypeNode ||
+                ts.createTypeLiteralNode([
+                  ts.createPropertySignature(undefined, ts.createIdentifier('value'), undefined, bool(), undefined),
+                ]),
             })
           }
 
-          createAction(`set${capitalizedName}Value`)
-          createAction(`set${capitalizedName}Values`)
-          createAction(`touch${capitalizedName}Field`)
-          createAction(`reset${capitalizedName}`)
-          createAction(`submit${capitalizedName}`)
-          createAction(`submit${capitalizedName}Request`)
-          createAction(`submit${capitalizedName}Success`)
-          createAction(`submit${capitalizedName}Failure`)
+          createAction(
+            `set${capitalizedFormKey}Value`,
+            [
+              // (key: string, value: any)
+              ts.createParameter(
+                undefined,
+                undefined,
+                undefined,
+                ts.createIdentifier('key'),
+                undefined,
+                ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                undefined,
+              ),
+              ts.createParameter(
+                undefined,
+                undefined,
+                undefined,
+                ts.createIdentifier('value'),
+                undefined,
+                ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+                undefined,
+              ),
+            ],
+            // { values: Partial<FormValueType> }
+            ts.createTypeLiteralNode([
+              ts.createPropertySignature(undefined, ts.createIdentifier('values'), undefined, partial(typeNode)),
+            ]),
+          )
+          createAction(
+            `set${capitalizedFormKey}Values`,
+            [
+              // (values: Partial<FormValueType>)
+              ts.createParameter(
+                undefined,
+                undefined,
+                undefined,
+                ts.createIdentifier('values'),
+                undefined,
+                partial(typeNode),
+                undefined,
+              ),
+            ],
+            // { values: Partial<FormValueType> }
+            ts.createTypeLiteralNode([
+              ts.createPropertySignature(undefined, ts.createIdentifier('values'), undefined, partial(typeNode)),
+            ]),
+          )
+          createAction(
+            `touch${capitalizedFormKey}Field`,
+            [
+              ts.createParameter(
+                undefined,
+                undefined,
+                undefined,
+                ts.createIdentifier('key'),
+                undefined,
+                string(),
+                undefined,
+              ),
+            ],
+            ts.createTypeLiteralNode([
+              ts.createPropertySignature(undefined, ts.createIdentifier('key'), undefined, string()),
+            ]),
+          )
+          createAction(
+            `reset${capitalizedFormKey}`,
+            [
+              // (values: Partial<FormValueType>)
+              ts.createParameter(
+                undefined,
+                undefined,
+                undefined,
+                ts.createIdentifier('values'),
+                ts.createToken(ts.SyntaxKind.QuestionToken),
+                typeNode,
+                undefined,
+              ),
+            ],
+            // { values: Partial<FormValueType> }
+            ts.createTypeLiteralNode([
+              ts.createPropertySignature(
+                undefined,
+                ts.createIdentifier('values'),
+                ts.createToken(ts.SyntaxKind.QuestionToken),
+                typeNode,
+              ),
+            ]),
+          )
+          createAction(`submit${capitalizedFormKey}`, [])
+          createAction(
+            `submit${capitalizedFormKey}Request`,
+            [
+              // params = ([formKey]: Form) => void
+              ts.createParameter(
+                undefined,
+                undefined,
+                undefined,
+                ts.createIdentifier(formKey),
+                undefined,
+                typeNode,
+                undefined,
+              ),
+            ],
+            // type payload = { [formKey]: Form }
+            ts.createTypeLiteralNode([
+              ts.createPropertySignature(undefined, ts.createIdentifier(formKey), undefined, typeNode),
+            ]),
+          )
+          createAction(
+            `submit${capitalizedFormKey}Success`,
+            [
+              // params = ([formKey]: Form) => void
+              ts.createParameter(
+                undefined,
+                undefined,
+                undefined,
+                ts.createIdentifier(formKey),
+                undefined,
+                typeNode,
+                undefined,
+              ),
+            ],
+            // type payload = { [formKey]: Form }
+            ts.createTypeLiteralNode([
+              ts.createPropertySignature(undefined, ts.createIdentifier(formKey), undefined, typeNode),
+            ]),
+          )
+          createAction(
+            `submit${capitalizedFormKey}Failure`,
+            [
+              // params = (error: Error) => void
+              ts.createParameter(
+                undefined,
+                undefined,
+                undefined,
+                ts.createIdentifier('error'),
+                undefined,
+                ts.createTypeReferenceNode(ts.createIdentifier('Error'), undefined),
+                undefined,
+              ),
+            ],
+            // type payload = { error: Error }
+            ts.createTypeLiteralNode([
+              ts.createPropertySignature(
+                undefined,
+                ts.createIdentifier('error'),
+                undefined,
+                ts.createTypeReferenceNode(ts.createIdentifier('Error'), undefined),
+              ),
+            ]),
+          )
 
           // add reducer with this default type
           const createReducer = (name: string, typeNode: ts.TypeNode = recordStringAny()) => {
@@ -100,10 +258,11 @@ export default {
             })
           }
 
-          createReducer(`${name}`, typeNode || recordStringAny())
-          createReducer(`is${capitalizedName}Submitting`, ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword))
-          createReducer(`show${capitalizedName}Errors`)
-          createReducer(`${name}Touches`)
+          createReducer(`${formKey}`, typeNode)
+          createReducer(`${formKey}Changes`, deepPartial(typeNode))
+          createReducer(`${formKey}Touches`, deepPartialMap(typeNode, bool()))
+          createReducer(`is${capitalizedFormKey}Submitting`, bool())
+          createReducer(`show${capitalizedFormKey}Errors`, bool())
 
           // add reducer with this default type
           const createSelector = (
@@ -117,15 +276,14 @@ export default {
             })
           }
 
-          createSelector(`${name}Changes`, recordStringAny())
-          createSelector(`${name}Changed`, ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword))
-          createSelector(`${name}Touched`, ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword))
-          createSelector(`${name}ValidationErrors`, recordStringAny())
-          createSelector(`${name}HasErrors`, ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword))
-          createSelector(`${name}Errors`, recordStringAny())
-          createSelector(`is${capitalizedName}Valid`, ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword))
+          createSelector(`${formKey}Changed`, bool())
+          createSelector(`${formKey}Touched`, bool())
+          createSelector(`${formKey}ValidationErrors`, deepPartialMap(typeNode, validationErrorType()))
+          createSelector(`${formKey}HasErrors`, bool())
+          createSelector(`${formKey}Errors`, deepPartialMap(typeNode, validationErrorType()))
+          createSelector(`is${capitalizedFormKey}Valid`, bool())
 
-          forms[name] = { typeNode: typeNode }
+          forms[formKey] = { typeNode: typeNode }
         }
 
         // add extra type for logic input
@@ -145,7 +303,7 @@ export default {
                     undefined,
                     ts.createIdentifier('defaults'),
                     ts.createToken(ts.SyntaxKind.QuestionToken),
-                    typeNode || recordStringAny(),
+                    typeNode,
                   ),
                   // submit?: (form: $typeNode || Record<string, any>) => void
                   ts.createPropertySignature(
@@ -161,7 +319,7 @@ export default {
                           undefined,
                           ts.createIdentifier('form'),
                           undefined,
-                          typeNode || recordStringAny(),
+                          typeNode,
                           undefined,
                         ),
                       ],
@@ -182,11 +340,11 @@ export default {
                           undefined,
                           ts.createIdentifier('form'),
                           undefined,
-                          typeNode || recordStringAny(),
+                          typeNode,
                           undefined,
                         ),
                       ],
-                      recordStringAny(),
+                      deepPartialMap(typeNode, validationErrorType()),
                     ),
                   ),
                 ]),
