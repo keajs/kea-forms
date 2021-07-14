@@ -131,3 +131,8 @@ function MyForm() {
 ```
 
 See the code in the `demo` folder for more.
+
+## Coming next on the roadmap
+
+- Async validation of fields
+- Nested fields (e.g. arrays of objects in the form)
