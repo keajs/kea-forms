@@ -1,6 +1,6 @@
 import './forms.scss'
 import { formsLogic } from './formsLogic'
-import { useValues } from 'kea'
+import { useActions, useValues } from 'kea'
 import { Form, Field } from 'kea-forms'
 
 interface InputProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> {
@@ -14,6 +14,7 @@ function Input({ onChange, value, ...props }: InputProps): JSX.Element {
 
 export function Forms() {
   const { isUserFormSubmitting } = useValues(formsLogic)
+  const { setUserFormValue } = useActions(formsLogic)
 
   return (
     <div>
@@ -33,6 +34,9 @@ export function Forms() {
             <option value="Lolz">Lolz</option>
           </select>
         </Field>
+
+        <button type="button" onClick={() => setUserFormValue('guest', '')}>No Guest</button>
+        <button type="button" onClick={() => setUserFormValue('guest', 'Other Name')}>Other Guest</button>
 
         <Field name="subscribe">
           {({ onChange, value }) => (
