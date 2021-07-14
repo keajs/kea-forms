@@ -2,26 +2,6 @@ import { BreakPointFunction, KeaPlugin, Logic } from 'kea'
 import { FormInput } from './types'
 import { capitalizeFirstLetter, hasErrors } from './utils'
 
-// actions:
-// - submitPluginDrawer
-// - submitPluginDrawerRequest
-// - submitPluginDrawerSuccess
-// - submitPluginDrawerFailure
-// - resetPluginDrawer(initialValues = undefined)
-// - setPluginDrawerValue(key: string, value: any)
-// - setPluginDrawerValues(values: Record<string, any>)
-// values:
-// - pluginDrawer = { id: 0, enabled: false, ... }
-// - pluginDrawerChanges = { enabled: true }
-// - pluginDrawerChanged = true
-// - pluginDrawerTouches = { enabled: true }
-// - pluginDrawerTouched = true
-// - pluginDrawerValidationErrors
-// - pluginDrawerErrors
-// - isPluginDrawerSubmitting
-// - pluginDrawerHasErrors
-// - canSubmitPluginDrawer
-
 export const formsPlugin = (): KeaPlugin => {
   return {
     name: 'forms',
@@ -45,8 +25,8 @@ export const formsPlugin = (): KeaPlugin => {
             actions: {
               [`set${capitalizedFormKey}Value`]: (key: string, value: any) => ({ values: { [key]: value } }),
               [`set${capitalizedFormKey}Values`]: (values: Record<string, any>) => ({ values }),
-              [`touch${capitalizedFormKey}Field`]: (field: string) => ({ field }),
-              [`reset${capitalizedFormKey}`]: true,
+              [`touch${capitalizedFormKey}Field`]: (key: string) => ({ key }),
+              [`reset${capitalizedFormKey}`]: (values?: Record<string, any>) => ({ values }),
               [`submit${capitalizedFormKey}`]: true,
               [`submit${capitalizedFormKey}Request`]: (formValues: Record<string, any>) => ({ [formKey]: formValues }),
               [`submit${capitalizedFormKey}Success`]: (formValues: Record<string, any>) => ({ [formKey]: formValues }),
@@ -64,11 +44,30 @@ export const formsPlugin = (): KeaPlugin => {
                     state: Record<string, any>,
                     { values }: { values: Record<string, any> },
                   ) => ({ ...state, ...values }),
+                  [`reset${capitalizedFormKey}`]: (
+                    state: Record<string, any>,
+                    { values }: { values: Record<string, any> },
+                  ) => values || formObject.defaults || {},
+                },
+              ],
+              [`${formKey}Changes`]: [
+                {},
+                {
+                  [`set${capitalizedFormKey}Value`]: (
+                    state: Record<string, any>,
+                    { values }: { values: Record<string, any> },
+                  ) => ({ ...state, ...values }),
+                  [`set${capitalizedFormKey}Values`]: (
+                    state: Record<string, any>,
+                    { values }: { values: Record<string, any> },
+                  ) => ({ ...state, ...values }),
+                  [`reset${capitalizedFormKey}`]: () => {},
                 },
               ],
               [`is${capitalizedFormKey}Submitting`]: [
                 false,
                 {
+                  [`reset${capitalizedFormKey}`]: () => false,
                   [`submit${capitalizedFormKey}Request`]: () => true,
                   [`submit${capitalizedFormKey}Success`]: () => false,
                   [`submit${capitalizedFormKey}Failure`]: () => false,
@@ -77,6 +76,7 @@ export const formsPlugin = (): KeaPlugin => {
               [`show${capitalizedFormKey}Errors`]: [
                 false,
                 {
+                  [`reset${capitalizedFormKey}`]: () => false,
                   [`submit${capitalizedFormKey}`]: () => true,
                   [`submit${capitalizedFormKey}Success`]: () => false,
                   [`submit${capitalizedFormKey}Failure`]: () => true,
@@ -86,13 +86,12 @@ export const formsPlugin = (): KeaPlugin => {
                 {} as Record<string, boolean>,
                 {
                   [`reset${capitalizedFormKey}`]: () => ({}),
-                  [`touch${capitalizedFormKey}Field`]: (state: Record<string, boolean>, { field }: { field: string }) =>
-                    field in state ? state : { ...state, [field]: true },
+                  [`touch${capitalizedFormKey}Field`]: (state: Record<string, boolean>, { key }: { key: string }) =>
+                    key in state ? state : { ...state, [key]: true },
                 },
               ],
             },
             selectors: {
-              [`${formKey}Changes`]: [(s) => [], () => []],
               [`${formKey}Changed`]: [
                 (s) => [s[`${formKey}Changes`]],
                 (changes: Record<string, any>) => Object.keys(changes).length > 0,
