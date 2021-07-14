@@ -10,7 +10,13 @@ This is an **experimental** plugin adding support for `forms` inside kea logic, 
 
 ## Installation
 
-Same with all other kea plugins:
+`kea-forms` requires kea-typegen `1.1.5+` and kea `2.4.5+`.
+
+```bash
+yarn add kea-forms
+```
+
+Set it up like all other kea plugins:
 
 ```ts
 import { Provider, resetContext } from 'kea'
@@ -105,7 +111,7 @@ function MyForm() {
       <p>Demonstrating a simple form below</p>
       <Form logic={formsLogic} form="userForm">
         <Field name="name" label="Name">
-          {/* `value` and `onChange` added automatically */}
+          {/* "value" and "onChange" added automatically */}
           <input className="form-input" />
         </Field>
 
