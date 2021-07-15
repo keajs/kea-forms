@@ -29,7 +29,6 @@ describe('kea-forms plugin', () => {
       'isPluginDrawerValid',
       'pluginDrawer',
       'pluginDrawerChanged',
-      'pluginDrawerChanges',
       'pluginDrawerErrors',
       'pluginDrawerHasErrors',
       'pluginDrawerTouched',
