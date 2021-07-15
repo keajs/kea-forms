@@ -37,14 +37,7 @@ export function Form({ logic, props, form, children }: FormProps): JSX.Element {
 
   return (
     <FormContext.Provider value={{ logic: logic(props), formKey: form }}>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          submitForm()
-        }}
-      >
-        {children}
-      </form>
+      <form onSubmit={(e) => e.preventDefault()}>{children}</form>
     </FormContext.Provider>
   )
 }
