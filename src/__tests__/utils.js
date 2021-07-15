@@ -1,5 +1,5 @@
 /* global test, expect, beforeEach */
-import { deepAssign, hasErrors, pathSelector, splitPathKey } from '../utils'
+import { deepAssign, deepTruthy, hasErrors, pathSelector, splitPathKey } from '../utils'
 
 const delay = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms))
 
@@ -52,6 +52,27 @@ describe('utils', () => {
     })
 
     expect(deepAssign([{ c: 123 }, { c: 234 }], '1', 444)).toEqual([{ c: 123 }, 444])
+  })
+
+  test('deepTruthy', () => {
+    expect(deepTruthy(true)).toBe(true)
+    expect(deepTruthy(false)).toBe(false)
+    expect(deepTruthy(null)).toBe(false)
+    expect(deepTruthy('')).toBe(false)
+    expect(deepTruthy(undefined)).toBe(false)
+    expect(deepTruthy(123)).toBe(true)
+    expect(deepTruthy('123')).toBe(true)
+    expect(deepTruthy({ a: false })).toBe(false)
+    expect(deepTruthy({ a: true })).toBe(true)
+    expect(deepTruthy({ a: false, b: true })).toBe(true)
+    expect(deepTruthy({ a: false, b: 'string' })).toBe(true)
+    expect(deepTruthy({ a: false, b: null })).toBe(false)
+    expect(deepTruthy({ a: false, b: { c: false } })).toBe(false)
+    expect(deepTruthy({ a: false, b: { c: false, d: true } })).toBe(true)
+    expect(deepTruthy({ a: false, b: [] })).toBe(false)
+    expect(deepTruthy({ a: false, b: [{ a: true }] })).toBe(true)
+    expect(deepTruthy({ a: false, b: [{ a: false }, [{ b: false }]] })).toBe(false)
+    expect(deepTruthy({ a: false, b: [{ a: false }, [{ b: true }]] })).toBe(true)
   })
 
   test('pathSelector', () => {

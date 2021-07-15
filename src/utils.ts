@@ -33,6 +33,16 @@ export function deepAssign(state: any, key: FieldName, value: any): any {
   return state
 }
 
+export function deepTruthy(state: any): boolean {
+  if (Array.isArray(state)) {
+    return state.some(deepTruthy)
+  }
+  if (!!state && typeof state === 'object') {
+    return Object.values(state).some(deepTruthy)
+  }
+  return !!state
+}
+
 export function pathSelector(path: FieldNamePath, state: any) {
   return [state].concat(path).reduce((v, a) => {
     if (!v) {
