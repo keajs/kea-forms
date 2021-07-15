@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { BuiltLogic, LogicWrapper, useActions } from 'kea'
-import { capitalizeFirstLetter } from './utils'
+import { capitalizeFirstLetter, pathSelector, splitPathKey } from './utils'
 import { useContext } from 'react'
 import { useSelector } from 'react-redux'
+import { FieldNamePath, FieldNameType } from './types'
 
 export interface FormProps {
   logic: LogicWrapper
@@ -13,7 +14,8 @@ export interface FormProps {
 
 export interface FieldProps {
   label?: React.ReactNode
-  name: string
+  hint?: React.ReactNode
+  name: (string | number) | (string | number)[]
   noStyle?: boolean
   children:
     | React.ReactElement
@@ -24,7 +26,7 @@ export interface FieldProps {
         onChange: (value: any) => void
         value: any
         id: string
-        name: string
+        name: (string | number) | (string | number)[]
       }) => React.ReactElement)
 }
 
@@ -47,7 +49,7 @@ export function Form({ logic, props, form, children }: FormProps): JSX.Element {
   )
 }
 
-export function Field({ name, label, noStyle, children }: FieldProps): JSX.Element {
+export function Field({ name, label, hint, noStyle, children }: FieldProps): JSX.Element {
   const { logic, formKey } = useContext(FormContext)
   if (!logic) {
     throw new Error('Please pass a logic to the <Form /> tag.')
@@ -56,9 +58,11 @@ export function Field({ name, label, noStyle, children }: FieldProps): JSX.Eleme
   const { [`set${capitalizedFormKey}Value`]: setValue, [`touch${capitalizedFormKey}Field`]: touchField } = useActions(
     logic,
   )
-  const value = useSelector((state) => logic?.selectors[formKey]?.(state)?.[name])
-  const error = useSelector((state) => logic?.selectors[`${formKey}Errors`]?.(state)?.[name])
-  const id = `${logic?.pathString}.${formKey}.${name}`
+  const nameString = Array.isArray(name) ? name.join('.') : name
+  const namePath = Array.isArray(name) ? (name as FieldNamePath) : splitPathKey(name as FieldNameType)
+  const value = useSelector((state) => pathSelector(namePath, logic?.selectors[formKey]?.(state)))
+  const error = useSelector((state) => pathSelector(namePath, logic?.selectors[`${formKey}Errors`]?.(state)))
+  const id = `${logic?.pathString}.${formKey}.${nameString}`
 
   const newProps = {
     id,
@@ -79,7 +83,7 @@ export function Field({ name, label, noStyle, children }: FieldProps): JSX.Eleme
             // <input> or <select>
             ...newProps,
             value: value || '', // pass default "" for <input />
-            onChange: (e: Event) => setValue(name, (e?.target as HTMLInputElement)?.value), // e.target.value
+            onChange: (e: Event) => setValue(namePath, (e?.target as HTMLInputElement)?.value), // e.target.value
             ...children.props,
           }
         : {
@@ -101,6 +105,7 @@ export function Field({ name, label, noStyle, children }: FieldProps): JSX.Eleme
       {label ? <label htmlFor={id}>{label}</label> : null}
       {kids}
       {error ? <div className="form-error">{error}</div> : null}
+      {hint ? <div className="form-hint">{hint}</div> : null}
     </div>
   )
 }

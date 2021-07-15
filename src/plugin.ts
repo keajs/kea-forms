@@ -1,6 +1,6 @@
 import { BreakPointFunction, KeaPlugin, Logic } from 'kea'
-import { FormInput } from './types'
-import { capitalizeFirstLetter, hasErrors } from './utils'
+import { FormInput, FieldName } from './types'
+import { capitalizeFirstLetter, deepAssign, deepTruthy, hasErrors } from './utils'
 
 export const formsPlugin = (): KeaPlugin => {
   return {
@@ -23,8 +23,9 @@ export const formsPlugin = (): KeaPlugin => {
 
           logic.extend({
             actions: {
-              [`set${capitalizedFormKey}Value`]: (key: string, value: any) => ({ values: { [key]: value } }),
+              [`set${capitalizedFormKey}Value`]: (name: FieldName, value: any) => ({ name, value }),
               [`set${capitalizedFormKey}Values`]: (values: Record<string, any>) => ({ values }),
+              // TODO: this should become nested and e.g. forget about deleted array indices
               [`touch${capitalizedFormKey}Field`]: (key: string) => ({ key }),
               [`reset${capitalizedFormKey}`]: (values?: Record<string, any>) => ({ values }),
               [`submit${capitalizedFormKey}`]: true,
@@ -38,8 +39,8 @@ export const formsPlugin = (): KeaPlugin => {
                 {
                   [`set${capitalizedFormKey}Value`]: (
                     state: Record<string, any>,
-                    { values }: { values: Record<string, any> },
-                  ) => ({ ...state, ...values }),
+                    { name, value }: { name: FieldName; value: any },
+                  ) => deepAssign(state, name, value),
                   [`set${capitalizedFormKey}Values`]: (
                     state: Record<string, any>,
                     { values }: { values: Record<string, any> },
@@ -48,20 +49,6 @@ export const formsPlugin = (): KeaPlugin => {
                     state: Record<string, any>,
                     { values }: { values: Record<string, any> },
                   ) => values || formObject.defaults || {},
-                },
-              ],
-              [`${formKey}Changes`]: [
-                {},
-                {
-                  [`set${capitalizedFormKey}Value`]: (
-                    state: Record<string, any>,
-                    { values }: { values: Record<string, any> },
-                  ) => ({ ...state, ...values }),
-                  [`set${capitalizedFormKey}Values`]: (
-                    state: Record<string, any>,
-                    { values }: { values: Record<string, any> },
-                  ) => ({ ...state, ...values }),
-                  [`reset${capitalizedFormKey}`]: () => {},
                 },
               ],
               [`is${capitalizedFormKey}Submitting`]: [
@@ -82,6 +69,14 @@ export const formsPlugin = (): KeaPlugin => {
                   [`submit${capitalizedFormKey}Failure`]: () => true,
                 },
               ],
+              [`${formKey}Changed`]: [
+                false,
+                {
+                  [`reset${capitalizedFormKey}`]: () => false,
+                  [`set${capitalizedFormKey}Value`]: () => true,
+                  [`set${capitalizedFormKey}Values`]: () => true,
+                },
+              ],
               [`${formKey}Touches`]: [
                 {} as Record<string, boolean>,
                 {
@@ -92,10 +87,6 @@ export const formsPlugin = (): KeaPlugin => {
               ],
             },
             selectors: {
-              [`${formKey}Changed`]: [
-                (s) => [s[`${formKey}Changes`]],
-                (changes: Record<string, any>) => Object.keys(changes).length > 0,
-              ],
               [`${formKey}Touched`]: [
                 (s) => [s[`${formKey}Touches`]],
                 (touches: Record<string, any>) => Object.keys(touches).length > 0,
@@ -105,7 +96,7 @@ export const formsPlugin = (): KeaPlugin => {
                 : [(s) => [s[formKey]], formObject.validator || (() => ({}))],
               [`${formKey}HasErrors`]: [
                 (s) => [s[`${formKey}ValidationErrors`]],
-                (validationErrors: Record<string, any>) => !!Object.values(validationErrors).find((a) => !!a),
+                (validationErrors: Record<string, any>) => deepTruthy(validationErrors),
               ],
               [`${formKey}Errors`]: [
                 (s) => [s[`${formKey}ValidationErrors`], s[`show${capitalizedFormKey}Errors`], s[`${formKey}Touches`]],
