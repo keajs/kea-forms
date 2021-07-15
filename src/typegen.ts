@@ -7,18 +7,16 @@ import { Plugin } from 'kea-typegen'
 import * as ts from 'typescript'
 import { capitalizeFirstLetter } from './utils'
 
-const recordStringAny = () =>
-  ts.createTypeReferenceNode(ts.createIdentifier('Record'), [
-    ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-    ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-  ])
-
+const record = (key1: ts.TypeNode, key2: ts.TypeNode) => ts.createTypeReferenceNode(ts.createIdentifier('Record'), [key1, key2])
 const bool = () => ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword)
 const string = () => ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
+const any = () => ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
 const partial = (node: ts.TypeNode) => ts.createTypeReferenceNode(ts.createIdentifier('Partial'), [node])
+const fieldName = () => ts.createTypeReferenceNode(ts.createIdentifier('FieldName'), undefined)
 const deepPartial = (node: ts.TypeNode) => ts.createTypeReferenceNode(ts.createIdentifier('DeepPartial'), [node])
 const deepPartialMap = (node: ts.TypeNode, mapTo: ts.TypeNode) =>
   ts.createTypeReferenceNode(ts.createIdentifier('DeepPartialMap'), [node, mapTo])
+const recordStringAny = () => record(string(), any())
 const validationErrorType = () => ts.createTypeReferenceNode(ts.createIdentifier('ValidationErrorType'), undefined)
 
 export default {
@@ -77,6 +75,7 @@ export default {
           }
           parsedLogic.typeReferencesToImportFromFiles['node_modules/kea-forms'].add('DeepPartial')
           parsedLogic.typeReferencesToImportFromFiles['node_modules/kea-forms'].add('DeepPartialMap')
+          parsedLogic.typeReferencesToImportFromFiles['node_modules/kea-forms'].add('FieldName')
           parsedLogic.typeReferencesToImportFromFiles['node_modules/kea-forms'].add('ValidationErrorType')
 
           // add actions
@@ -108,7 +107,7 @@ export default {
                 undefined,
                 ts.createIdentifier('key'),
                 undefined,
-                ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                fieldName(),
                 undefined,
               ),
               ts.createParameter(
@@ -123,7 +122,8 @@ export default {
             ],
             // { values: Partial<FormValueType> }
             ts.createTypeLiteralNode([
-              ts.createPropertySignature(undefined, ts.createIdentifier('values'), undefined, partial(typeNode)),
+              ts.createPropertySignature(undefined, ts.createIdentifier('name'), undefined, fieldName()),
+              ts.createPropertySignature(undefined, ts.createIdentifier('value'), undefined, any()),
             ]),
           )
           createAction(
@@ -136,13 +136,13 @@ export default {
                 undefined,
                 ts.createIdentifier('values'),
                 undefined,
-                partial(typeNode),
+                deepPartial(typeNode),
                 undefined,
               ),
             ],
             // { values: Partial<FormValueType> }
             ts.createTypeLiteralNode([
-              ts.createPropertySignature(undefined, ts.createIdentifier('values'), undefined, partial(typeNode)),
+              ts.createPropertySignature(undefined, ts.createIdentifier('values'), undefined, deepPartial(typeNode)),
             ]),
           )
           createAction(
@@ -259,10 +259,10 @@ export default {
           }
 
           createReducer(`${formKey}`, typeNode)
-          createReducer(`${formKey}Changes`, deepPartial(typeNode))
-          createReducer(`${formKey}Touches`, deepPartialMap(typeNode, bool()))
           createReducer(`is${capitalizedFormKey}Submitting`, bool())
           createReducer(`show${capitalizedFormKey}Errors`, bool())
+          createReducer(`${formKey}Changed`, bool())
+          createReducer(`${formKey}Touches`, record(string(), bool()))
 
           // add reducer with this default type
           const createSelector = (
@@ -276,7 +276,6 @@ export default {
             })
           }
 
-          createSelector(`${formKey}Changed`, bool())
           createSelector(`${formKey}Touched`, bool())
           createSelector(`${formKey}ValidationErrors`, deepPartialMap(typeNode, validationErrorType()))
           createSelector(`${formKey}HasErrors`, bool())
