@@ -14,6 +14,12 @@ export interface FormInput<LogicType extends Logic> {
   options?: Partial<FormOptions>
 }
 
+export type FieldNameType = string | boolean
+export type FieldNamePath = FieldNameType[]
+export type FieldName = FieldNameType | FieldNamePath
+
+export type ValidationErrorType = string | boolean | undefined | null
+
 // https://stackoverflow.com/a/61233706
 type NonAny = number | boolean | string | symbol | null
 export type DeepPartial<T> = {
@@ -33,8 +39,6 @@ export type DeepPartial<T> = {
     ? T[P]
     : DeepPartial<T[P]> // recurse for all non-array and non-primative values
 }
-
-export type ValidationErrorType = string | boolean | undefined | null
 
 export type DeepPartialMap<T, F> = {
   [P in keyof T]?: T[P] extends NonAny[] // checks for nested any[]
