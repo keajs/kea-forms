@@ -14,7 +14,7 @@ function Input({ onChange, value, ...props }: InputProps): JSX.Element {
 
 export function Forms() {
   const { isUserFormSubmitting, userForm } = useValues(formsLogic)
-  const { setUserFormValue, setUserFormValues, removeAccount } = useActions(formsLogic)
+  const { setUserFormValue, setUserFormValues, removeAccount, submitUserForm } = useActions(formsLogic)
 
   return (
     <div>
@@ -35,12 +35,8 @@ export function Forms() {
           </select>
         </Field>
 
-        <button type="button" onClick={() => setUserFormValue('guest', '')}>
-          No Guest
-        </button>
-        <button type="button" onClick={() => setUserFormValue('guest', 'Other Name')}>
-          Other Guest
-        </button>
+        <button onClick={() => setUserFormValue('guest', '')}>No Guest</button>
+        <button onClick={() => setUserFormValue('guest', 'Other Name')}>Other Guest</button>
 
         <h2>Accounts</h2>
 
@@ -66,9 +62,7 @@ export function Forms() {
           </div>
         ))}
 
-        <button type="button" onClick={() => setUserFormValues({ accounts: [...userForm.accounts, {}] })}>
-          Add Account
-        </button>
+        <button onClick={() => setUserFormValues({ accounts: [...userForm.accounts, {}] })}>Add Account</button>
 
         <Field name="subscribe">
           {({ onChange, value }) => (
@@ -80,7 +74,9 @@ export function Forms() {
         </Field>
 
         <div>
-          <input type="submit" value={isUserFormSubmitting ? '... ' : 'Submit Form!'} className="form-submit" />
+          <button onClick={submitUserForm} className="form-submit">
+            {isUserFormSubmitting ? '... ' : 'Submit Form!'}
+          </button>
         </div>
       </Form>
     </div>
