@@ -38,38 +38,12 @@ export function Forms() {
         <button onClick={() => setUserFormValue('guest', '')}>No Guest</button>
         <button onClick={() => setUserFormValue('guest', 'Other Name')}>Other Guest</button>
 
-        <h2>Accounts</h2>
-
-        {userForm.accounts.map((account, index) => (
-          <div key={index}>
-            <h3>Account #{index + 1}</h3>
-            <button onClick={() => removeAccount(index)}>Remove</button>
-            <Field
-              name={`accounts.${index}.provider`}
-              label="Provider"
-              hint={account.provider === Provider.Facebook ? 'Are you sure you trust this one?' : null}
-            >
-              <select>
-                <option value="" />
-                <option value={Provider.Facebook}>Facebook</option>
-                <option value={Provider.Google}>Google</option>
-                <option value={Provider.Twitter}>Twitter</option>
-              </select>
-            </Field>
-            <Field name={['accounts', index, 'url']} label="Url">
-              <Input className="form-input" />
-            </Field>
-          </div>
-        ))}
-
-        <button onClick={() => setUserFormValues({ accounts: [...userForm.accounts, {}] })}>Add Account</button>
-
         <h2>Accounts via &lt;Group /&gt;</h2>
 
         {userForm.accounts.map((account, index) => (
           <Group key={index} name={['accounts', index]}>
-            <h3>Account #{index + 1}</h3>
-            <button onClick={() => removeAccount(index)}>Remove</button>
+            <h3>Account #{index + 1} <button onClick={() => removeAccount(index)}>Remove</button></h3>
+
             <Field
               name='provider'
               label="Provider"
