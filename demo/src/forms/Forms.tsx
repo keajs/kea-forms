@@ -1,7 +1,7 @@
 import './forms.scss'
 import { formsLogic, Provider } from './formsLogic'
 import { useActions, useValues } from 'kea'
-import { Form, Field } from 'kea-forms'
+import { Form, Field, Group } from 'kea-forms'
 
 interface InputProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> {
   onChange?: (value: string) => void
@@ -60,6 +60,32 @@ export function Forms() {
               <Input className="form-input" />
             </Field>
           </div>
+        ))}
+
+        <button onClick={() => setUserFormValues({ accounts: [...userForm.accounts, {}] })}>Add Account</button>
+
+        <h2>Accounts via &lt;Group /&gt;</h2>
+
+        {userForm.accounts.map((account, index) => (
+          <Group key={index} name={['accounts', index]}>
+            <h3>Account #{index + 1}</h3>
+            <button onClick={() => removeAccount(index)}>Remove</button>
+            <Field
+              name='provider'
+              label="Provider"
+              hint={account.provider === Provider.Facebook ? 'Are you sure you trust this one?' : null}
+            >
+              <select>
+                <option value="" />
+                <option value={Provider.Facebook}>Facebook</option>
+                <option value={Provider.Google}>Google</option>
+                <option value={Provider.Twitter}>Twitter</option>
+              </select>
+            </Field>
+            <Field name='url' label="Url">
+              <Input className="form-input" />
+            </Field>
+          </Group>
         ))}
 
         <button onClick={() => setUserFormValues({ accounts: [...userForm.accounts, {}] })}>Add Account</button>

@@ -14,7 +14,7 @@ export interface FormInput<LogicType extends Logic> {
   options?: Partial<FormOptions>
 }
 
-export type FieldNameType = string | boolean
+export type FieldNameType = string | number
 export type FieldNamePath = FieldNameType[]
 export type FieldName = FieldNameType | FieldNamePath
 

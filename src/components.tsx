@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { BuiltLogic, LogicWrapper, useActions } from 'kea'
+import { BuiltLogic, LogicWrapper, useActions, useMountedLogic } from 'kea'
 import { capitalizeFirstLetter, pathSelector, splitPathKey } from './utils'
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { FieldNamePath, FieldNameType } from './types'
 
@@ -12,10 +12,15 @@ export interface FormProps {
   children: any
 }
 
+export interface GroupProps {
+  name: FieldNamePath | FieldNameType
+  children: any
+}
+
 export interface FieldProps {
   label?: React.ReactNode
   hint?: React.ReactNode
-  name: (string | number) | (string | number)[]
+  name: FieldNamePath | FieldNameType
   noStyle?: boolean
   children:
     | React.ReactElement
@@ -26,33 +31,60 @@ export interface FieldProps {
         onChange: (value: any) => void
         value: any
         id: string
-        name: (string | number) | (string | number)[]
+        name: FieldNamePath | FieldNameType
       }) => React.ReactElement)
 }
 
-const FormContext = React.createContext({} as { logic: BuiltLogic | undefined; formKey: string })
+interface FormContextProps {
+  logic: BuiltLogic | undefined
+  formKey: string
+  namePrefix?: FieldNameType[]
+}
+
+export const FormContext = React.createContext({} as FormContextProps)
 
 export function Form({ logic, props, form, children }: FormProps): JSX.Element {
-  const { [`submit${capitalizeFirstLetter(form)}`]: submitForm } = useActions(logic(props))
+  useMountedLogic(logic(props))
+
+  const newFormContext = useMemo(() => ({ logic: logic(props), formKey: form }), [logic(props), form])
 
   return (
-    <FormContext.Provider value={{ logic: logic(props), formKey: form }}>
+    <FormContext.Provider value={newFormContext}>
       <form onSubmit={(e) => e.preventDefault()}>{children}</form>
     </FormContext.Provider>
   )
 }
 
+export function Group({ name, children }: GroupProps): JSX.Element {
+  const formContext = useContext(FormContext)
+
+  const namePath = [
+    ...(formContext.namePrefix || []),
+    ...(Array.isArray(name) ? (name as FieldNamePath) : splitPathKey(name as FieldNameType)),
+  ]
+
+  const newFormContext = useMemo(() => ({ ...formContext, namePrefix: namePath }), [formContext, namePath.join('.')])
+
+  return <FormContext.Provider value={newFormContext}>{children}</FormContext.Provider>
+}
+
 export function Field({ name, label, hint, noStyle, children }: FieldProps): JSX.Element {
-  const { logic, formKey } = useContext(FormContext)
+  const { logic, formKey, namePrefix } = useContext(FormContext)
   if (!logic) {
-    throw new Error('Please pass a logic to the <Form /> tag.')
+    throw new Error('Please pass a "logic" to the <Form /> tag.')
+  }
+  if (!formKey) {
+    throw new Error('Please pass a "formKey" to the <Form /> tag.')
   }
   const capitalizedFormKey = capitalizeFirstLetter(formKey)
   const { [`set${capitalizedFormKey}Value`]: setValue, [`touch${capitalizedFormKey}Field`]: touchField } = useActions(
     logic,
   )
-  const nameString = Array.isArray(name) ? name.join('.') : name
-  const namePath = Array.isArray(name) ? (name as FieldNamePath) : splitPathKey(name as FieldNameType)
+  const namePath = [
+    ...(namePrefix || []),
+    ...(Array.isArray(name) ? (name as FieldNamePath) : splitPathKey(name as FieldNameType)),
+  ]
+  const nameString = namePath.join('.')
   const value = useSelector((state) => pathSelector(namePath, logic?.selectors[formKey]?.(state)))
   const error = useSelector((state) => pathSelector(namePath, logic?.selectors[`${formKey}Errors`]?.(state)))
   const id = `${logic?.pathString}.${formKey}.${nameString}`
@@ -61,8 +93,8 @@ export function Field({ name, label, hint, noStyle, children }: FieldProps): JSX
     id,
     name,
     value,
-    onChange: (c: string) => setValue(name, c),
-    onBlur: () => touchField(name),
+    onChange: (c: string) => setValue(namePath, c),
+    onBlur: () => touchField(nameString),
   }
 
   let kids
