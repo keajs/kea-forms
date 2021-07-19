@@ -42,10 +42,12 @@ export function Forms() {
 
         {userForm.accounts.map((account, index) => (
           <Group key={index} name={['accounts', index]}>
-            <h3>Account #{index + 1} <button onClick={() => removeAccount(index)}>Remove</button></h3>
+            <h3>
+              Account #{index + 1} <button onClick={() => removeAccount(index)}>Remove</button>
+            </h3>
 
             <Field
-              name='provider'
+              name="provider"
               label="Provider"
               hint={account.provider === Provider.Facebook ? 'Are you sure you trust this one?' : null}
             >
@@ -56,7 +58,7 @@ export function Forms() {
                 <option value={Provider.Twitter}>Twitter</option>
               </select>
             </Field>
-            <Field name='url' label="Url">
+            <Field name="url" label="Url">
               <Input className="form-input" />
             </Field>
           </Group>
