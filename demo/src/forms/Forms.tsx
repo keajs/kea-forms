@@ -1,7 +1,8 @@
 import './forms.scss'
 import { formsLogic, Provider } from './formsLogic'
-import { useActions, useValues } from 'kea'
-import { Form, Field, Group } from 'kea-forms'
+import { Logic, useActions, useValues } from 'kea'
+import { Form } from 'kea-forms'
+import { Group } from '../../../src'
 
 interface InputProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> {
   onChange?: (value: string) => void
@@ -12,10 +13,31 @@ function Input({ onChange, value, ...props }: InputProps): JSX.Element {
   return <input {...props} value={value || ''} onChange={(e) => onChange?.(e.target.value)} />
 }
 
+type CreateFormReturnType<R extends Record<string, any>> = {
+  Field: ({ name, label, children }: { name: keyof R; label: string; children: any }) => JSX.Element
+  // Group: ({ name, label, children }: { name: keyof R; label: string; children: any }) => JSX.Element
+}
+
+function useField<
+  L extends Logic = Logic,
+  F extends string = string,
+  S extends (form: L['values'][F]) => any = (form: L['values'][F]) => any
+>(
+  logic: L,
+  form: F,
+  selector: S
+): { Field: ({ name, label, children }: { name: keyof ReturnType<S>; label?: string; children: any }) => JSX.Element } {
+  // @ts-ignore
+  return null
+}
+
 export function Forms() {
   const { isUserFormSubmitting, userForm } = useValues(formsLogic)
   const { setUserFormValue, setUserFormValues, removeAccount, submitUserForm } = useActions(formsLogic)
 
+  const { Field } = useField(formsLogic, 'userForm', (f) => f.accounts[0])
+  // const { Field } = useForm(formsLogic, 'userForm', (f) => f)
+  const a = Field({ name: "provider", children: 'bla' })
   return (
     <div>
       <p>Demonstrating a simple form below</p>

@@ -1,4 +1,4 @@
-import { kea } from 'kea'
+import {kea, MakeLogicType} from 'kea'
 import { formsLogicType } from './formsLogicType'
 import { validateEmail } from './utils'
 
@@ -53,3 +53,20 @@ export const formsLogic = kea<formsLogicType<UserFormType>>({
     },
   },
 })
+
+type ItemType = string
+type SomeLogicValues<T> = { valueKey: T }
+type SomeLogicActions<T> = { actionKey: () => { payloadKey: T } }
+
+type SomeLogicType<T> = MakeLogicType<
+  SomeLogicValues<T>,
+  SomeLogicActions<T>
+>;
+
+export const SomeLogic = kea<SomeLogicType<ItemType>>({
+  actions: {
+
+  }
+})
+
+SomeLogic.actions.actionKey()
