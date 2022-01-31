@@ -1,8 +1,7 @@
 import './forms.scss'
 import { formsLogic, Provider } from './formsLogic'
 import { Logic, useActions, useValues } from 'kea'
-import { Form } from 'kea-forms'
-import { Group } from '../../../src'
+import React from 'react'
 
 interface InputProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> {
   onChange?: (value: string) => void
@@ -13,20 +12,33 @@ function Input({ onChange, value, ...props }: InputProps): JSX.Element {
   return <input {...props} value={value || ''} onChange={(e) => onChange?.(e.target.value)} />
 }
 
-type CreateFormReturnType<R extends Record<string, any>> = {
-  Field: ({ name, label, children }: { name: keyof R; label: string; children: any }) => JSX.Element
-  // Group: ({ name, label, children }: { name: keyof R; label: string; children: any }) => JSX.Element
+
+// TODO: this doesn't work for the "value" and "onChange"
+type FieldProps<F extends Record<string, any>> = 
+  keyof F extends infer T ? T extends keyof F ? {
+    name: T;    
+    label?: string; 
+    hint?: React.ReactNode; 
+    children: React.ReactNode | ((props: { value: F[T], onChange: (value: F[T]) => void }) => React.ReactNode)
+  } : never : never
+
+
+interface FieldType<F extends Record<string, any>> {
+  (props: FieldProps<F>): JSX.Element,
+  nested<S extends Record<string, any>>(selector: (form: F) => S): FieldType<S>,
 }
 
-function useField<
+function useForm<
   L extends Logic = Logic,
   F extends string = string,
-  S extends (form: L['values'][F]) => any = (form: L['values'][F]) => any
+  V extends Record<string, any> = L['values'][F],
 >(
   logic: L,
   form: F,
-  selector: S
-): { Field: ({ name, label, children }: { name: keyof ReturnType<S>; label?: string; children: any }) => JSX.Element } {
+): { 
+  Field: FieldType<V>,
+  Form: (props: { children: React.ReactNode }) => JSX.Element
+} {
   // @ts-ignore
   return null
 }
@@ -35,13 +47,12 @@ export function Forms() {
   const { isUserFormSubmitting, userForm } = useValues(formsLogic)
   const { setUserFormValue, setUserFormValues, removeAccount, submitUserForm } = useActions(formsLogic)
 
-  const { Field } = useField(formsLogic, 'userForm', (f) => f.accounts[0])
-  // const { Field } = useForm(formsLogic, 'userForm', (f) => f)
-  const a = Field({ name: "provider", children: 'bla' })
+  const { Form, Field } = useForm(formsLogic, 'userForm')
+
   return (
     <div>
       <p>Demonstrating a simple form below</p>
-      <Form logic={formsLogic} form="userForm">
+      <Form>
         <Field name="name" label="Name">
           <input className="form-input" />
         </Field>
@@ -62,29 +73,41 @@ export function Forms() {
 
         <h2>Accounts via &lt;Group /&gt;</h2>
 
-        {userForm.accounts.map((account, index) => (
-          <Group key={index} name={['accounts', index]}>
-            <h3>
-              Account #{index + 1} <button onClick={() => removeAccount(index)}>Remove</button>
-            </h3>
+        {userForm.accounts.map((account, index) => {
+          const AccountField = Field.nested(f => f.accounts[index])
 
-            <Field
-              name="provider"
-              label="Provider"
-              hint={account.provider === Provider.Facebook ? 'Are you sure you trust this one?' : null}
-            >
-              <select>
-                <option value="" />
-                <option value={Provider.Facebook}>Facebook</option>
-                <option value={Provider.Google}>Google</option>
-                <option value={Provider.Twitter}>Twitter</option>
-              </select>
-            </Field>
-            <Field name="url" label="Url">
-              <Input className="form-input" />
-            </Field>
-          </Group>
-        ))}
+          return (
+            <React.Fragment key={index}>
+              <h3>
+                Account #{index + 1} <button onClick={() => removeAccount(index)}>Remove</button>
+              </h3>
+
+              <AccountField
+                name="provider"
+                label="Provider"
+                hint={account.provider === Provider.Facebook ? 'Are you sure you trust this one?' : null}
+              >
+                <select>
+                  <option value="" />
+                  <option value={Provider.Facebook}>Facebook</option>
+                  <option value={Provider.Google}>Google</option>
+                  <option value={Provider.Twitter}>Twitter</option>
+                </select>
+              </AccountField>
+              <AccountField name="url" label="Url">
+                {({ value, onChange }) => <Input className="form-input" value={value} onChange={onChange} />}          
+              </AccountField>
+
+              <AccountField
+                name="provider"
+                label="Provider"
+                hint={account.provider === Provider.Facebook ? 'Are you sure you trust this one?' : null}
+              >
+                {({ value, onChange }) => <Input className="form-input" value={value} onChange={onChange} />}          
+              </AccountField>            
+            </React.Fragment>
+          )
+        })}
 
         <button onClick={() => setUserFormValues({ accounts: [...userForm.accounts, {}] })}>Add Account</button>
 

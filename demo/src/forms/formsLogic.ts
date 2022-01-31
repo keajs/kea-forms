@@ -16,7 +16,9 @@ export interface AccountType {
 export interface UserFormType {
   name: string
   email: string
+  guest?: string
   accounts: AccountType[]
+  subscribe?: boolean
 }
 
 export const formsLogic = kea<formsLogicType<UserFormType>>({
@@ -39,8 +41,8 @@ export const formsLogic = kea<formsLogicType<UserFormType>>({
           url: !a.url && 'Please enter a url',
         })),
       }),
-      submit: (formValues) => {
-        console.log('submitting!', formValues)
+      submit: (userForm) => {
+        console.log('submitting!', userForm)
       },
     },
   },
