@@ -16,10 +16,11 @@ function Input({ onChange, value, ...props }: InputProps): JSX.Element {
 // TODO: this doesn't work for the "value" and "onChange"
 type FieldProps<F extends Record<string, any>> = 
   keyof F extends infer T ? T extends keyof F ? {
-    name: T;    
+    name: T;
     label?: string; 
+    value?: F[T],
     hint?: React.ReactNode; 
-    children: React.ReactNode | ((props: { value: F[T], onChange: (value: F[T]) => void }) => React.ReactNode)
+    children: React.ReactNode | ((props: { bla: boolean, value: F[T], onChange: (value: F[T]) => void }) => JSX.Element);
   } : never : never
 
 
@@ -53,6 +54,20 @@ export function Forms() {
     <div>
       <p>Demonstrating a simple form below</p>
       <Form>
+        <Field name="subscribe" children={({ bla, onChange, value }) => <div />} />
+        <Field name="subscribe">
+          {({  }) => (
+            <Form><br /></Form>
+          )}
+        </Field>
+        <Field name="subscribe">
+          {({ bla, onChange, value }) => (
+            <label>
+              <input type="checkbox" onChange={(e) => onChange(e.target.checked)} value={value} /> Subscribe to our
+              newsletter!!
+            </label>
+          )}
+        </Field>
         <Field name="name" label="Name">
           <input className="form-input" />
         </Field>
@@ -111,8 +126,8 @@ export function Forms() {
 
         <button onClick={() => setUserFormValues({ accounts: [...userForm.accounts, {}] })}>Add Account</button>
 
-        <Field name="subscribe">
-          {({ onChange, value }) => (
+        <Field name="subscribe" value>
+          {({ bla, onChange, value }) => (
             <label>
               <input type="checkbox" onChange={(e) => onChange(e.target.checked)} value={value} /> Subscribe to our
               newsletter!!
