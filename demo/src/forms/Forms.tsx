@@ -12,32 +12,29 @@ function Input({ onChange, value, ...props }: InputProps): JSX.Element {
   return <input {...props} value={value || ''} onChange={(e) => onChange?.(e.target.value)} />
 }
 
-
 // TODO: this doesn't work for the "value" and "onChange"
-type FieldProps<F extends Record<string, any>> = 
-  keyof F extends infer T ? T extends keyof F ? {
-    name: T;
-    label?: string; 
-    value?: F[T],
-    hint?: React.ReactNode; 
-    children: React.ReactNode | ((props: { bla: boolean, value: F[T], onChange: (value: F[T]) => void }) => JSX.Element);
-  } : never : never
-
+type FieldProps<F extends Record<string, any>> = keyof F extends infer T
+  ? T extends keyof F
+    ? {
+        name: T
+        label?: string | React.ReactNode
+        value?: F[T]
+        hint?: string | React.ReactNode
+        children: React.ReactNode | ((props: { value: F[T]; onChange: (value: F[T]) => void }) => JSX.Element)
+      }
+    : never
+  : never
 
 interface FieldType<F extends Record<string, any>> {
-  (props: FieldProps<F>): JSX.Element,
-  nested<S extends Record<string, any>>(selector: (form: F) => S): FieldType<S>,
+  (props: FieldProps<F>): JSX.Element
+  nested<S extends Record<string, any>>(selector: (form: F) => S): FieldType<S>
 }
 
-function useForm<
-  L extends Logic = Logic,
-  F extends string = string,
-  V extends Record<string, any> = L['values'][F],
->(
+function useForm<L extends Logic = Logic, F extends string = string, V extends Record<string, any> = L['values'][F]>(
   logic: L,
-  form: F,
-): { 
-  Field: FieldType<V>,
+  form: F
+): {
+  Field: FieldType<V>
   Form: (props: { children: React.ReactNode }) => JSX.Element
 } {
   // @ts-ignore
@@ -56,8 +53,10 @@ export function Forms() {
       <Form>
         <Field name="subscribe" children={({ bla, onChange, value }) => <div />} />
         <Field name="subscribe">
-          {({  }) => (
-            <Form><br /></Form>
+          {({ onChange, value }) => (
+            <Form>
+              <br />
+            </Form>
           )}
         </Field>
         <Field name="subscribe">
@@ -89,7 +88,7 @@ export function Forms() {
         <h2>Accounts via &lt;Group /&gt;</h2>
 
         {userForm.accounts.map((account, index) => {
-          const AccountField = Field.nested(f => f.accounts[index])
+          const AccountField = Field.nested((f) => f.accounts[index])
 
           return (
             <React.Fragment key={index}>
@@ -110,7 +109,7 @@ export function Forms() {
                 </select>
               </AccountField>
               <AccountField name="url" label="Url">
-                {({ value, onChange }) => <Input className="form-input" value={value} onChange={onChange} />}          
+                {({ value, onChange }) => <Input className="form-input" value={value} onChange={onChange} />}
               </AccountField>
 
               <AccountField
@@ -118,8 +117,8 @@ export function Forms() {
                 label="Provider"
                 hint={account.provider === Provider.Facebook ? 'Are you sure you trust this one?' : null}
               >
-                {({ value, onChange }) => <Input className="form-input" value={value} onChange={onChange} />}          
-              </AccountField>            
+                {({ value, onChange }) => <Input className="form-input" value={value} onChange={onChange} />}
+              </AccountField>
             </React.Fragment>
           )
         })}
