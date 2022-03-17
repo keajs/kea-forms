@@ -1,14 +1,15 @@
 import * as React from 'react'
 import { BuiltLogic, LogicWrapper, useActions, useMountedLogic } from 'kea'
 import { capitalizeFirstLetter, pathSelector, splitPathKey } from './utils'
-import { useContext, useMemo } from 'react'
+import { ChangeEvent, useContext, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { FieldNamePath, FieldNameType } from './types'
 
-export interface FormProps {
+export interface FormProps extends React.HTMLProps<HTMLFormElement> {
   logic: LogicWrapper
   props?: Record<string, any>
-  form: string
+  formKey: string
+  disableFormOnSubmit?: boolean
   children: any
 }
 
@@ -17,22 +18,28 @@ export interface GroupProps {
   children: any
 }
 
+export interface ChildFunctionProps {
+  onChange: (event: ChangeEvent) => void
+  onValueChange: (value: any) => void
+  value: any
+  id: string
+  name: FieldNamePath | FieldNameType
+}
+
 export interface FieldProps {
   label?: React.ReactNode
   hint?: React.ReactNode
   name: FieldNamePath | FieldNameType
+  validateStatus?: string
+  help?: React.ReactNode
   noStyle?: boolean
-  children:
-    | React.ReactElement
-    | (({
-        onChange,
-        value,
-      }: {
-        onChange: (value: any) => void
-        value: any
-        id: string
-        name: FieldNamePath | FieldNameType
-      }) => React.ReactElement)
+  children: React.ReactElement | ((props: ChildFunctionProps) => React.ReactElement)
+  template?: (args: {
+    label?: React.ReactNode
+    hint?: React.ReactNode
+    error: React.ReactNode
+    kids: React.ReactElement | ((props: ChildFunctionProps) => React.ReactElement)
+  }) => JSX.Element
 }
 
 interface FormContextProps {
@@ -43,14 +50,25 @@ interface FormContextProps {
 
 export const FormContext = React.createContext({} as FormContextProps)
 
-export function Form({ logic, props, form, children }: FormProps): JSX.Element {
-  useMountedLogic(logic(props))
+export function Form({ logic, props, formKey, children, disableFormOnSubmit, ...otherProps }: FormProps): JSX.Element {
+  const builtLogic = logic(props)
+  useMountedLogic(builtLogic)
 
-  const newFormContext = useMemo(() => ({ logic: logic(props), formKey: form }), [logic(props), form])
+  const newFormContext = useMemo(() => ({ logic: builtLogic, formKey }), [builtLogic, formKey])
 
   return (
     <FormContext.Provider value={newFormContext}>
-      <form onSubmit={(e) => e.preventDefault()}>{children}</form>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (!disableFormOnSubmit) {
+            builtLogic.actions[`submit${capitalizeFirstLetter(formKey)}`]?.()
+          }
+        }}
+        {...otherProps}
+      >
+        {children}
+      </form>
     </FormContext.Provider>
   )
 }
@@ -68,7 +86,7 @@ export function Group({ name, children }: GroupProps): JSX.Element {
   return <FormContext.Provider value={newFormContext}>{children}</FormContext.Provider>
 }
 
-export function Field({ name, label, hint, noStyle, children }: FieldProps): JSX.Element {
+export function Field({ name, label, hint, noStyle, children, template }: FieldProps): JSX.Element {
   const { logic, formKey, namePrefix } = useContext(FormContext)
   if (!logic) {
     throw new Error('Please pass a "logic" to the <Form /> tag.')
@@ -77,9 +95,8 @@ export function Field({ name, label, hint, noStyle, children }: FieldProps): JSX
     throw new Error('Please pass a "formKey" to the <Form /> tag.')
   }
   const capitalizedFormKey = capitalizeFirstLetter(formKey)
-  const { [`set${capitalizedFormKey}Value`]: setValue, [`touch${capitalizedFormKey}Field`]: touchField } = useActions(
-    logic,
-  )
+  const { [`set${capitalizedFormKey}Value`]: setValue, [`touch${capitalizedFormKey}Field`]: touchField } =
+    useActions(logic)
   const namePath = [
     ...(namePrefix || []),
     ...(Array.isArray(name) ? (name as FieldNamePath) : splitPathKey(name as FieldNameType)),
@@ -93,32 +110,36 @@ export function Field({ name, label, hint, noStyle, children }: FieldProps): JSX
     id,
     name,
     value,
-    onChange: (c: string) => setValue(namePath, c),
-    onBlur: () => touchField(nameString),
+    onChange: (e: ChangeEvent) => {
+      setValue(namePath, (e?.target as HTMLInputElement)?.value)
+    },
+    onBlur: () => {
+      touchField(nameString)
+    },
   }
 
   let kids
   if (typeof children === 'function') {
     // function as children
-    kids = children(newProps)
+    kids = children({
+      ...newProps,
+      onValueChange: (c: string) => {
+        setValue(namePath, c)
+      },
+    })
   } else if (children) {
-    const props =
-      children.type === 'input' || children.type === 'select'
-        ? {
-            // <input> or <select>
-            ...newProps,
-            value: value || '', // pass default "" for <input />
-            onChange: (e: Event) => setValue(namePath, (e?.target as HTMLInputElement)?.value), // e.target.value
-            ...children.props,
-          }
-        : {
-            // other dom or react element
-            ...newProps,
-            ...children.props,
-          }
+    const props = {
+      ...newProps,
+      value: children.type === 'input' || children.type === 'select' ? value || '' : value, // pass default "" for <input />
+      ...children.props,
+    }
     kids = React.cloneElement(children, props)
   } else {
     kids = <></>
+  }
+
+  if (template) {
+    return template({ label, kids, error, hint })
   }
 
   if (noStyle) {

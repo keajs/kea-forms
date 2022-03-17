@@ -33,24 +33,27 @@ export const formsPlugin = (): KeaPlugin => {
               [`submit${capitalizedFormKey}Success`]: (formValues: Record<string, any>) => ({ [formKey]: formValues }),
               [`submit${capitalizedFormKey}Failure`]: (error: Error) => ({ error }),
             },
+            defaults: formObject.defaults
+              ? {
+                  [formKey]: formObject.defaults,
+                }
+              : {},
             reducers: {
-              [formKey]: [
-                formObject.defaults || {},
-                {
-                  [`set${capitalizedFormKey}Value`]: (
-                    state: Record<string, any>,
-                    { name, value }: { name: FieldName; value: any },
-                  ) => deepAssign(state, name, value),
-                  [`set${capitalizedFormKey}Values`]: (
-                    state: Record<string, any>,
-                    { values }: { values: Record<string, any> },
-                  ) => ({ ...state, ...values }),
-                  [`reset${capitalizedFormKey}`]: (
-                    state: Record<string, any>,
-                    { values }: { values: Record<string, any> },
-                  ) => values || formObject.defaults || {},
-                },
-              ],
+              [formKey]: {
+                [`set${capitalizedFormKey}Value`]: (
+                  state: Record<string, any>,
+                  { name, value }: { name: FieldName; value: any },
+                ) => deepAssign(state, name, value),
+                [`set${capitalizedFormKey}Values`]: (
+                  state: Record<string, any>,
+                  { values }: { values: Record<string, any> },
+                ) => ({ ...state, ...values }),
+                [`reset${capitalizedFormKey}`]: (
+                  state: Record<string, any>,
+                  { values }: { values: Record<string, any> },
+                ) => values || formObject.defaults || {},
+              },
+
               [`is${capitalizedFormKey}Submitting`]: [
                 false,
                 {
