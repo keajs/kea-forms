@@ -10,7 +10,10 @@ export interface FormInput<LogicType extends Logic> {
   validator?:
     | ((formValues: Record<string, any>) => Record<string, any>)
     | SelectorDefinition<LogicType['selectors'], any>
-  submit?: (formValues: Record<string, any>, breakpoint: BreakPointFunction) => void | Promise<void>
+  submit?: <T extends Record<string, any> = Record<string, any>>(
+    formValues: T,
+    breakpoint: BreakPointFunction,
+  ) => void | Promise<void> | T | Promise<T>
   options?: Partial<FormOptions>
 }
 

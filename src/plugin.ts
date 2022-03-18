@@ -129,8 +129,10 @@ export const formsPlugin = (): KeaPlugin => {
                 breakpoint: BreakPointFunction,
               ) => {
                 try {
-                  await formObject.submit?.(formValues, breakpoint)
-                  actions[`submit${capitalizedFormKey}Success`](formValues)
+                  const newValues = await formObject.submit?.(formValues, breakpoint)
+                  actions[`submit${capitalizedFormKey}Success`](
+                    typeof newValues !== 'undefined' ? newValues : formValues,
+                  )
                 } catch (error) {
                   actions[`submit${capitalizedFormKey}Failure`](error)
                 }

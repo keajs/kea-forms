@@ -7,7 +7,8 @@ import { Plugin } from 'kea-typegen'
 import * as ts from 'typescript'
 import { capitalizeFirstLetter } from './utils'
 
-const record = (key1: ts.TypeNode, key2: ts.TypeNode) => ts.createTypeReferenceNode(ts.createIdentifier('Record'), [key1, key2])
+const record = (key1: ts.TypeNode, key2: ts.TypeNode) =>
+  ts.createTypeReferenceNode(ts.createIdentifier('Record'), [key1, key2])
 const bool = () => ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword)
 const string = () => ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
 const any = () => ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
@@ -285,6 +286,9 @@ export default {
           forms[formKey] = { typeNode: typeNode }
         }
 
+        // make sure parsed logic imports BreakPointFunction
+        parsedLogic.importFromKeaInLogicType.add('BreakPointFunction')
+
         // add extra type for logic input
         parsedLogic.extraInput!['forms'] = {
           // adds support for both { inline: (logic) => ({}) } and { inline: {} }
@@ -321,8 +325,24 @@ export default {
                           typeNode,
                           undefined,
                         ),
+                        ts.createParameter(
+                          undefined,
+                          undefined,
+                          undefined,
+                          ts.createIdentifier('breakpoint'),
+                          undefined,
+                          ts.createTypeReferenceNode(ts.createIdentifier('BreakPointFunction'), undefined),
+                          undefined,
+                        ),
                       ],
-                      ts.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
+                      ts.createUnionTypeNode([
+                        ts.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
+                        ts.createTypeReferenceNode(ts.createIdentifier('Promise'), [
+                          ts.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
+                        ]),
+                        typeNode,
+                        ts.createTypeReferenceNode(ts.createIdentifier('Promise'), [typeNode]),
+                      ]),
                     ),
                   ),
                   // validator?: (form: $typeNode || Record<string, any>) => Record<string, any>
