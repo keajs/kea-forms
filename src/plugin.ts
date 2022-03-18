@@ -1,4 +1,4 @@
-import { BreakPointFunction, KeaPlugin, Logic } from 'kea'
+import { BreakPointFunction, isBreakpoint, KeaPlugin, Logic } from 'kea'
 import { FormInput, FieldName } from './types'
 import { capitalizeFirstLetter, deepAssign, deepTruthy, hasErrors } from './utils'
 
@@ -134,7 +134,9 @@ export const formsPlugin = (): KeaPlugin => {
                     typeof newValues !== 'undefined' ? newValues : formValues,
                   )
                 } catch (error) {
-                  actions[`submit${capitalizedFormKey}Failure`](error)
+                  if (!isBreakpoint(error)) {
+                    actions[`submit${capitalizedFormKey}Failure`](error)
+                  }
                 }
               },
             }),
