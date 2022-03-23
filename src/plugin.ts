@@ -94,9 +94,9 @@ export const formsPlugin = (): KeaPlugin => {
                 (s) => [s[`${formKey}Touches`]],
                 (touches: Record<string, any>) => Object.keys(touches).length > 0,
               ],
-              [`${formKey}ValidationErrors`]: Array.isArray(formObject.validator)
-                ? formObject.validator
-                : [(s) => [s[formKey]], formObject.validator || (() => ({}))],
+              [`${formKey}ValidationErrors`]: Array.isArray(formObject.errors)
+                ? formObject.errors
+                : [(s) => [s[formKey]], formObject.errors || (() => ({}))],
               [`${formKey}HasErrors`]: [
                 (s) => [s[`${formKey}ValidationErrors`]],
                 (validationErrors: Record<string, any>) => deepTruthy(validationErrors),

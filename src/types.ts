@@ -7,9 +7,7 @@ export interface FormOptions {
 
 export interface FormInput<LogicType extends Logic> {
   defaults?: Record<string, any>
-  validator?:
-    | ((formValues: Record<string, any>) => Record<string, any>)
-    | SelectorDefinition<LogicType['selectors'], any>
+  errors?: ((formValues: Record<string, any>) => Record<string, any>) | SelectorDefinition<LogicType['selectors'], any>
   submit?: <T extends Record<string, any> = Record<string, any>>(
     formValues: T,
     breakpoint: BreakPointFunction,

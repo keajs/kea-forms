@@ -46,7 +46,7 @@ export const formsLogic = kea<formsLogicType<UserFormType>>({
         name: '',
         email: '',
       } as UserFormType,
-      validator: (values) => ({
+      errors: (values) => ({
         name: !values.name && 'Please enter a name',
         email: !values.email
           ? 'Please enter an email'

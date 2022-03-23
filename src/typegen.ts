@@ -345,10 +345,10 @@ export default {
                       ]),
                     ),
                   ),
-                  // validator?: (form: $typeNode || Record<string, any>) => Record<string, any>
+                  // errors?: (formValues: $typeNode || Record<string, any>) => Record<string, any>
                   ts.createPropertySignature(
                     undefined,
-                    ts.createIdentifier('validator'),
+                    ts.createIdentifier('errors'),
                     ts.createToken(ts.SyntaxKind.QuestionToken),
                     ts.createFunctionTypeNode(
                       undefined,
@@ -357,7 +357,7 @@ export default {
                           undefined,
                           undefined,
                           undefined,
-                          ts.createIdentifier('form'),
+                          ts.createIdentifier(name),
                           undefined,
                           typeNode,
                           undefined,

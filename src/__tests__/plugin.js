@@ -78,12 +78,12 @@ describe('kea-forms plugin', () => {
     unmount()
   })
 
-  test('validator sync', async () => {
+  test('errors sync', async () => {
     const logic = kea({
       forms: {
         pluginDrawer: {
           defaults: { name: '', email: '' },
-          validator: (pluginDrawer) => ({
+          errors: (pluginDrawer) => ({
             name: !pluginDrawer.name && 'Please enter a name!',
             email: !pluginDrawer.email && 'Please enter an email!',
           }),
