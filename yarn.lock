@@ -2459,15 +2459,10 @@ camelcase@^6.0.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-6.2.0.tgz#924af881c9d525ac9d87f40d964e5cea982a1809"
   integrity sha512-c7wVvbw3f37nuobQNtgsgG9POC9qMbNuMQmTCqZv23b6MIz0fcYpBiOlv9gEN/hdLdnZTDQhg6e9Dq5M1vKvfg==
 
-caniuse-lite@^1.0.30001214:
-  version "1.0.30001214"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001214.tgz#70f153c78223515c6d37a9fde6cd69250da9d872"
-  integrity sha512-O2/SCpuaU3eASWVaesQirZv1MSjUNOvmugaD8zNSJqw6Vv5SGwoOpA9LJs3pNPfM745nxqPvfZY3MQKY4AKHYg==
-
-caniuse-lite@^1.0.30001219:
-  version "1.0.30001242"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001242.tgz#04201627abcd60dc89211f22cbe2347306cda46b"
-  integrity sha512-KvNuZ/duufelMB3w2xtf9gEWCSxJwUgoxOx5b6ScLXC4kPc9xsczUVCPrQU26j5kOsHM4pSUL54tAZt5THQKug==
+caniuse-lite@^1.0.30001214, caniuse-lite@^1.0.30001219:
+  version "1.0.30001325"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001325.tgz"
+  integrity sha512-sB1bZHjseSjDtijV1Hb7PB2Zd58Kyx+n/9EotvZ4Qcz2K3d0lWB8dB4nb8wN/TsOGFq3UuAm0zQZNQ4SoR7TrQ==
 
 capture-exit@^2.0.0:
   version "2.0.0"
@@ -4634,20 +4629,20 @@ jsprim@^1.2.2:
     array-includes "^3.1.2"
     object.assign "^4.1.2"
 
-kea-typegen@^1.4.3:
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/kea-typegen/-/kea-typegen-1.4.3.tgz#bdee4c3add82f8eebb1573b3db58ed0b05cb1ffc"
-  integrity sha512-l/WhfaEkMMOG9jPn5e5/tveBQBTiJyXurNBng/+orZbQyt4Rdg7Jrdj+ZYzqJqtWJuzsnO0tYF2vS91wmiDJ/g==
+kea-typegen@^3.0.0-alpha.0:
+  version "3.0.0-alpha.0"
+  resolved "https://registry.yarnpkg.com/kea-typegen/-/kea-typegen-3.0.0-alpha.0.tgz#1f486062452373f586388a0a4f5b1f0166621dc8"
+  integrity sha512-ehhH8E4vmAGkm6XjY5TmYMZdvEqyfjob2ndQpYbqBvxc+jqCdm6+NYkPBfbJfyR6qVcupHWUXlgkUTQ4wuXvqA==
   dependencies:
     "@wessberg/ts-clone-node" "0.3.19"
     diff "^5.0.0"
     prettier "^2.5.1"
     yargs "^16.2.0"
 
-kea@^2.4.5:
-  version "2.4.6"
-  resolved "https://registry.yarnpkg.com/kea/-/kea-2.4.6.tgz#07782a79c5f036e6514d6300281416e736ed98e3"
-  integrity sha512-NuH1GOck4Dmr18Kjrto8ZsL6n7OgL2CagQeqPnFjdjyxBgNS7JDusex6G9sasW5Cp1D0Cb4izJvFVocj0fS8Jg==
+kea@^3.0.0-alpha.1:
+  version "3.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/kea/-/kea-3.0.0-alpha.1.tgz#4458b9df0a9a02abd109d339f9d191fb7da548c1"
+  integrity sha512-AvP8xk/lIXTfhd4K/fknIS9Z9bZbW+CCTNSgt4jlm9wUnyy6JWxzxKg1Aw5WbwpkbnFDMBU62B+gjsoi+w4TIg==
 
 kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
   version "3.2.2"
