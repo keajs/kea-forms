@@ -1,6 +1,7 @@
-import { kea } from 'kea'
-import { formsLogicType } from './formsLogicType'
+import { actions, kea, reducers } from 'kea'
+import type { formsLogicType } from './formsLogicType'
 import { validateEmail } from './utils'
+import { forms } from 'kea-forms'
 
 export enum Provider {
   Facebook = 'facebook',
@@ -19,8 +20,8 @@ export interface UserFormType {
   accounts: AccountType[]
 }
 
-export const formsLogic = kea<formsLogicType<UserFormType>>({
-  forms: {
+export const formsLogic = kea<formsLogicType<UserFormType>>([
+  forms({
     userForm: {
       defaults: {
         name: '',
@@ -43,13 +44,13 @@ export const formsLogic = kea<formsLogicType<UserFormType>>({
         console.log('submitting!', formValues)
       },
     },
-  },
-  actions: {
+  }),
+  actions({
     removeAccount: (index: number) => ({ index }),
-  },
-  reducers: {
+  }),
+  reducers({
     userForm: {
       removeAccount: (state, { index }) => ({ ...state, accounts: state.accounts.filter((_, i) => i !== index) }),
     },
-  },
-})
+  }),
+])

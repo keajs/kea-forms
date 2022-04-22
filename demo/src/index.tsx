@@ -6,10 +6,9 @@ import reportWebVitals from './reportWebVitals'
 import { Provider, resetContext } from 'kea'
 import { routerPlugin } from 'kea-router'
 import { loadersPlugin } from 'kea-loaders'
-import { formsPlugin } from 'kea-forms'
 
 resetContext({
-  plugins: [routerPlugin, loadersPlugin, formsPlugin],
+  plugins: [routerPlugin, loadersPlugin],
 })
 
 ReactDOM.render(
