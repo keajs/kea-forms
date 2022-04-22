@@ -31,7 +31,7 @@
     "tsconfig.json"
   ],
   "peerDependencies": {
-    "kea": ">= 2.4.6"
+    "kea": ">= 3"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
@@ -76,7 +76,7 @@
     "jest": "^26.0.1",
     "jest-environment-node-debug": "^2.0.0",
     "kea": "^3.0.0-alpha.1",
-    "kea-typegen": "^3.0.0-alpha.0",
+    "kea-typegen": "^3.0.0-alpha.2",
     "prettier": "^2.3.2",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",

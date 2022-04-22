@@ -5,15 +5,20 @@ export interface FormOptions {
   showErrorsOnTouch: boolean
 }
 
-export interface FormInput<LogicType extends Logic> {
-  defaults?: Record<string, any>
-  errors?: ((formValues: Record<string, any>) => Record<string, any>) | SelectorDefinition<LogicType['selectors'], any>
-  submit?: <T extends Record<string, any> = Record<string, any>>(
-    formValues: T,
-    breakpoint: BreakPointFunction,
-  ) => void | Promise<void> | T | Promise<T>
+export interface FormInput<L extends Logic, T extends Record<string, any> = Record<string, any>> {
+  defaults?: T
+  errors?: ((formValues: T) => DeepPartialMap<T, ValidationErrorType>) | SelectorDefinition<L['selectors'], any>
+  submit?: (formValues: T, breakpoint: BreakPointFunction) => void | Promise<void> | T | Promise<T>
   options?: Partial<FormOptions>
 }
+
+export type FormDefinitions<L extends Logic> = L['values'] extends Record<string, any>
+  ? Partial<
+      {
+        [K in keyof L['values']]: FormInput<L, L['values'][K]>
+      }
+    >
+  : Record<string, FormInput<L>>
 
 export type FieldNameType = string | number
 export type FieldNamePath = FieldNameType[]

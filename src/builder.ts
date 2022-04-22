@@ -1,4 +1,4 @@
-import { FieldName, FormInput } from './types'
+import { FieldName, FormDefinitions } from './types'
 import {
   BreakPointFunction,
   BuiltLogic,
@@ -14,7 +14,7 @@ import {
 import { capitalizeFirstLetter, deepAssign, deepTruthy, hasErrors } from './utils'
 
 export function forms<L extends Logic = Logic>(
-  input: Record<string, FormInput<L>> | ((logic: BuiltLogic<L>) => Record<string, FormInput<L>>),
+  input: FormDefinitions<L> | ((logic: BuiltLogic<L>) => FormDefinitions<L>),
 ): LogicBuilder<L> {
   return (logic) => {
     const forms = typeof input === 'function' ? input(logic) : input
