@@ -51,8 +51,7 @@ interface FormContextProps {
 export const FormContext = React.createContext({} as FormContextProps)
 
 export function Form({ logic, props, formKey, children, disableFormOnSubmit, ...otherProps }: FormProps): JSX.Element {
-  const builtLogic = logic(props)
-  useMountedLogic(builtLogic)
+  const builtLogic = useMountedLogic(props ? logic(props) : logic)
 
   const newFormContext = useMemo(() => ({ logic: builtLogic, formKey }), [builtLogic, formKey])
 
