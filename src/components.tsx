@@ -6,10 +6,14 @@ import { useSelector } from 'react-redux'
 import { FieldNamePath, FieldNameType } from './types'
 
 export interface FormProps extends React.HTMLProps<HTMLFormElement> {
+  /** Logic that contains the form, without the props */
   logic: LogicWrapper
+  /** Props for the logic, taken from BindLogic if available */
   props?: Record<string, any>
+  /** Key on the form */
   formKey: string
-  disableFormOnSubmit?: boolean
+  /** Enable onSubmit events to trigger submit action.  */
+  enableFormOnSubmit?: boolean
   children: any
 }
 
@@ -50,7 +54,7 @@ interface FormContextProps {
 
 export const FormContext = React.createContext({} as FormContextProps)
 
-export function Form({ logic, props, formKey, children, disableFormOnSubmit, ...otherProps }: FormProps): JSX.Element {
+export function Form({ logic, props, formKey, children, enableFormOnSubmit, ...otherProps }: FormProps): JSX.Element {
   const builtLogic = useMountedLogic(props ? logic(props) : logic)
 
   const newFormContext = useMemo(() => ({ logic: builtLogic, formKey }), [builtLogic, formKey])
@@ -60,7 +64,7 @@ export function Form({ logic, props, formKey, children, disableFormOnSubmit, ...
       <form
         onSubmit={(e) => {
           e.preventDefault()
-          if (!disableFormOnSubmit) {
+          if (enableFormOnSubmit) {
             builtLogic.actions[`submit${capitalizeFirstLetter(formKey)}`]?.()
           }
         }}

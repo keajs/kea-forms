@@ -20,7 +20,8 @@
     "prepublishOnly": "npm run test && npm run build",
     "start": "npm run watch",
     "test": "BABEL_ENV=test jest",
-    "demo:rebuild": "yarn build && cd demo && rm -rf node_modules && yarn && cd .."
+    "demo:rebuild": "yarn build && cd demo && rm -rf node_modules && yarn && cd ..",
+    "demo:start": "cd demo && yarn start"
   },
   "files": [
     "lib",
