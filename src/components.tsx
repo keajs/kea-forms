@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { BuiltLogic, LogicWrapper, useActions, useMountedLogic } from 'kea'
+import { BuiltLogic, LogicWrapper, useActions, useMountedLogic, useSelector } from 'kea'
 import { capitalizeFirstLetter, pathSelector, splitPathKey } from './utils'
 import { ChangeEvent, useContext, useMemo } from 'react'
-import { useSelector } from 'react-redux'
 import { FieldNamePath, FieldNameType } from './types'
 
 export interface FormProps extends React.HTMLProps<HTMLFormElement> {
