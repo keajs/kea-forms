@@ -26,6 +26,7 @@ export const formsLogic = kea<formsLogicType<UserFormType>>([
       defaults: {
         name: '',
         email: '',
+        description: '',
         accounts: [],
       } as UserFormType,
       errors: (values) => ({

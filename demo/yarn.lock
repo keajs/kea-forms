@@ -6860,15 +6860,15 @@ jsprim@^1.2.2:
 "kea-forms@file:../lib":
   version "0.0.0"
 
-kea-loaders@^3.0.0-alpha.2:
-  version "3.0.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/kea-loaders/-/kea-loaders-3.0.0-alpha.2.tgz#a77a33644d37d143c08d4309a48c16af9828484c"
-  integrity sha512-bwfcOEzVaK0BS5w2doEugI0vZW1iyhaaN8x5st6UQeT6dlqSttCDaXkVmoqKfbpVdd/WrHAV6QqvqaRriuFv+w==
+kea-loaders@^3.0.0-alpha.4:
+  version "3.0.0-alpha.4"
+  resolved "https://registry.yarnpkg.com/kea-loaders/-/kea-loaders-3.0.0-alpha.4.tgz#aa66a6e61cf46e76e256f3a116365c2b67b03d8f"
+  integrity sha512-bisajrP4/fZiiX1u7TRDDEtb0rRSBO9XgPkSM7jd6ewyI/W7vQrd59X7wmDmDvgO8/g6xtBeNI3piJ3tRutxPQ==
 
-kea-router@^3.0.0-alpha.0:
-  version "3.0.0-alpha.0"
-  resolved "https://registry.yarnpkg.com/kea-router/-/kea-router-3.0.0-alpha.0.tgz#9df5d60e608e14b4881d6c2c785de6243ffe5f7c"
-  integrity sha512-gGai3mPQtZRljVHimCJuVgFTNmtrtUtNcrxFjrRrbQMLjJqQglIUODcNWIhppw1J/A6Hx6kFg+DHfSLAV+Q+LA==
+kea-router@^3.0.0-alpha.1:
+  version "3.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/kea-router/-/kea-router-3.0.0-alpha.1.tgz#3c0a27b3217fa37ee4d20f85d750986912fbca39"
+  integrity sha512-BAesYqHmgp7RAVIJUFJeMMmKUK0IoC9/lo03lKIU92Af643PCxyrWRVI/b8PYjRIrZVFQiw0g5qs7xJg1zo/JQ==
   dependencies:
     url-pattern "^1.0.3"
 
@@ -6882,10 +6882,14 @@ kea-typegen@^3.0.0-alpha.3:
     recast "^0.20.5"
     yargs "^16.2.0"
 
-kea@^3.0.0-alpha.6:
-  version "3.0.0-alpha.6"
-  resolved "https://registry.yarnpkg.com/kea/-/kea-3.0.0-alpha.6.tgz#fef0b7f9c66a15df6437ed33a97dd152f2e0e20e"
-  integrity sha512-uKsuQezYIWW16TB5hTztC7VPsrT9fg0kKz5cy+WS6QPvDE6eMpeuTF6vNdG/WlHKJTKj5E54rp0dk+gcR+KKMA==
+kea@^3.0.0-beta.5:
+  version "3.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/kea/-/kea-3.0.0-beta.5.tgz#af9a41e9e53a149d666ecefff2bbcc86778b6416"
+  integrity sha512-IvFcW+JdeI0zK+hBL30oX7Z3vATVHJB+FWiQvWiKeIN4O64u61gUQ1UNYIwGnuqvyfsiii8PjLSs2pfotfzARA==
+  dependencies:
+    redux "^4.2.0"
+    reselect "^4.1.5"
+    use-sync-external-store "^1.0.0"
 
 killable@^1.0.1:
   version "1.0.1"
@@ -9341,6 +9345,13 @@ redux@^4.0.0, redux@^4.1.0:
   dependencies:
     "@babel/runtime" "^7.9.2"
 
+redux@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/redux/-/redux-4.2.0.tgz#46f10d6e29b6666df758780437651eeb2b969f13"
+  integrity sha512-oSBmcKKIuIR4ME29/AeNUnl5L+hvBq7OaJWzaptTQJAntaPvxIJqfnjbaEiCzzaIz+XmVILfqAM3Ob0aXLPfjA==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+
 regenerate-unicode-properties@^8.2.0:
   version "8.2.0"
   resolved "https://registry.yarnpkg.com/regenerate-unicode-properties/-/regenerate-unicode-properties-8.2.0.tgz#e5de7111d655e7ba60c057dbe9ff37c87e65cdec"
@@ -9517,6 +9528,11 @@ reselect@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/reselect/-/reselect-4.0.0.tgz#f2529830e5d3d0e021408b246a206ef4ea4437f7"
   integrity sha512-qUgANli03jjAyGlnbYVAV5vvnOmJnODyABz51RdBN7M4WaVu8mecZWgyQNkG8Yqe3KRGRt0l4K4B3XVEULC4CA==
+
+reselect@^4.1.5:
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/reselect/-/reselect-4.1.5.tgz#852c361247198da6756d07d9296c2b51eddb79f6"
+  integrity sha512-uVdlz8J7OO+ASpBYoz1Zypgx0KasCY20H+N8JD13oUMtPvSHQuscrHop4KbXrbsBcdB9Ds7lVK7eRkBIfO43vQ==
 
 resolve-cwd@^2.0.0:
   version "2.0.0"
@@ -11020,6 +11036,11 @@ url@^0.11.0:
   dependencies:
     punycode "1.3.2"
     querystring "0.2.0"
+
+use-sync-external-store@^1.0.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.1.0.tgz#3343c3fe7f7e404db70f8c687adf5c1652d34e82"
+  integrity sha512-SEnieB2FPKEVne66NpXPd1Np4R1lTNKfjuy3XdIoPQKYBAFdzbzSZlSn1KJZUiihQLQC5Znot4SBz1EOTBwQAQ==
 
 use@^3.1.0:
   version "3.1.1"

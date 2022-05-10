@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "kea": "^3.0.0-alpha.6",
+    "kea": "^3.0.0-beta.5",
     "kea-forms": "file:../lib",
-    "kea-loaders": "^3.0.0-alpha.2",
-    "kea-router": "^3.0.0-alpha.0",
+    "kea-loaders": "^3.0.0-alpha.4",
+    "kea-router": "^3.0.0-alpha.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.4",

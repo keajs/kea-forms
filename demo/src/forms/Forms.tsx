@@ -3,6 +3,11 @@ import { formsLogic, Provider } from './formsLogic'
 import { useActions, useValues } from 'kea'
 import { Form, Field, Group } from 'kea-forms'
 
+// custom component
+function TextField({ value, onChange }: { value?: string; onChange?: (value: string) => void } = {}) {
+  return <textarea value={value ?? ''} onChange={(e) => onChange?.(e.target.value)} className="form-input" rows={6} />
+}
+
 export function Forms() {
   const { isUserFormSubmitting, userForm } = useValues(formsLogic)
   const { setUserFormValue, setUserFormValues, removeAccount, submitUserForm } = useActions(formsLogic)
@@ -24,6 +29,9 @@ export function Forms() {
             <option value="Other Name">Other Name</option>
             <option value="Lolz">Lolz</option>
           </select>
+        </Field>
+        <Field name="description" label="Description">
+          <TextField />
         </Field>
 
         <button onClick={() => setUserFormValue('guest', '')}>No Guest</button>
@@ -58,9 +66,9 @@ export function Forms() {
         <button onClick={() => setUserFormValues({ accounts: [...userForm.accounts, {}] })}>Add Account</button>
 
         <Field name="subscribe">
-          {({ onValueChange, value }) => (
+          {({ onChange, value }) => (
             <label>
-              <input type="checkbox" onChange={(e) => onValueChange(e.target.checked)} value={value} /> Subscribe to our
+              <input type="checkbox" onChange={(e) => onChange(e.target.checked)} value={value} /> Subscribe to our
               newsletter!!
             </label>
           )}

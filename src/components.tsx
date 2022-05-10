@@ -22,8 +22,8 @@ export interface GroupProps {
 }
 
 export interface ChildFunctionProps {
-  onChange: (event: ChangeEvent) => void
-  onValueChange: (value: any) => void
+  onChangeEvent: (event: ChangeEvent) => void
+  onChange: (value: any) => void
   value: any
   id: string
   name: FieldNamePath | FieldNameType
@@ -50,6 +50,8 @@ interface FormContextProps {
   formKey: string
   namePrefix?: FieldNameType[]
 }
+
+export const isHTMLField = (type: string) => ['input', 'select', 'textarea'].includes(type)
 
 export const FormContext = React.createContext({} as FormContextProps)
 
@@ -112,30 +114,40 @@ export function Field({ name, label, hint, noStyle, children, template }: FieldP
     id,
     name,
     value,
-    onChange: (e: ChangeEvent) => {
-      setValue(namePath, (e?.target as HTMLInputElement)?.value)
-    },
     onBlur: () => {
       touchField(nameString)
+    },
+    onChange: (c: string) => {
+      setValue(namePath, c)
     },
   }
 
   let kids
+  // function as children
   if (typeof children === 'function') {
-    // function as children
     kids = children({
       ...newProps,
-      onValueChange: (c: string) => {
-        setValue(namePath, c)
+      onChangeEvent: (e: ChangeEvent) => {
+        setValue(namePath, (e?.target as HTMLInputElement)?.value)
       },
     })
   } else if (children) {
-    const props = {
-      ...newProps,
-      value: children.type === 'input' || children.type === 'select' ? value || '' : value, // pass default "" for <input />
-      ...children.props,
+    const isHTMLElement = typeof children.type === 'string' && isHTMLField(children.type)
+    if (isHTMLElement) {
+      kids = React.cloneElement(children, {
+        ...newProps,
+        value: isHTMLElement ? value || '' : value, // pass default "" for <input />
+        onChange: (e: ChangeEvent) => {
+          setValue(namePath, (e?.target as HTMLInputElement)?.value)
+        },
+        ...children.props,
+      })
+    } else {
+      kids = React.cloneElement(children, {
+        ...newProps,
+        ...children.props,
+      })
     }
-    kids = React.cloneElement(children, props)
   } else {
     kids = <></>
   }
