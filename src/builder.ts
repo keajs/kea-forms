@@ -26,13 +26,14 @@ export function forms<L extends Logic = Logic>(
       actions({
         [`set${capitalizedFormKey}Value`]: (name: FieldName, value: any) => ({ name, value }),
         [`set${capitalizedFormKey}Values`]: (values: Record<string, any>) => ({ values }),
+        [`set${capitalizedFormKey}ManualErrors`]: (errors: Record<string, any>) => ({ errors }),
         // TODO: this should become nested and e.g. forget about deleted array indices
         [`touch${capitalizedFormKey}Field`]: (key: string) => ({ key }),
         [`reset${capitalizedFormKey}`]: (values?: Record<string, any>) => ({ values }),
         [`submit${capitalizedFormKey}`]: true,
         [`submit${capitalizedFormKey}Request`]: (formValues: Record<string, any>) => ({ [formKey]: formValues }),
         [`submit${capitalizedFormKey}Success`]: (formValues: Record<string, any>) => ({ [formKey]: formValues }),
-        [`submit${capitalizedFormKey}Failure`]: (error: Error) => ({ error }),
+        [`submit${capitalizedFormKey}Failure`]: (error: Error, errors: Record<string, any>) => ({ error, errors }),
       })(logic)
 
       if (formObject.defaults) {
@@ -68,6 +69,7 @@ export function forms<L extends Logic = Logic>(
           false,
           {
             [`reset${capitalizedFormKey}`]: () => false,
+            [`set${capitalizedFormKey}ManualErrors`]: () => true,
             [`submit${capitalizedFormKey}`]: () => true,
             [`submit${capitalizedFormKey}Success`]: () => false,
             [`submit${capitalizedFormKey}Failure`]: () => true,
@@ -89,6 +91,20 @@ export function forms<L extends Logic = Logic>(
               key in state ? state : { ...state, [key]: true },
           },
         ],
+        [`${formKey}ManualErrors`]: [
+          {} as Record<string, any>,
+          {
+            [`reset${capitalizedFormKey}`]: () => ({}),
+            [`set${capitalizedFormKey}ManualErrors`]: (_, { errors }: { errors: Record<string, any> }) => errors,
+            [`touch${capitalizedFormKey}Field`]: (state: Record<string, any>, { key }: { key: string }) => {
+              if (key in state) {
+                const { [key]: _discard, ...rest } = state
+                return rest
+              }
+              return state
+            },
+          },
+        ],
       })(logic)
       selectors({
         [`${formKey}Touched`]: [
@@ -98,17 +114,24 @@ export function forms<L extends Logic = Logic>(
         [`${formKey}ValidationErrors`]: Array.isArray(formObject.errors)
           ? formObject.errors
           : [(s) => [s[formKey]], formObject.errors || (() => ({}))],
+        [`${formKey}AllErrors`]: [
+          (s) => [s[`${formKey}ValidationErrors`], s[`${formKey}ManualErrors`]],
+          (validationErrors: Record<string, any>, manualErrors: Record<string, any>) => ({
+            ...validationErrors,
+            ...manualErrors,
+          }),
+        ],
         [`${formKey}HasErrors`]: [
-          (s) => [s[`${formKey}ValidationErrors`]],
-          (validationErrors: Record<string, any>) => deepTruthy(validationErrors),
+          (s) => [s[`${formKey}AllErrors`]],
+          (allErrors: Record<string, any>) => deepTruthy(allErrors),
         ],
         [`${formKey}Errors`]: [
-          (s) => [s[`${formKey}ValidationErrors`], s[`show${capitalizedFormKey}Errors`], s[`${formKey}Touches`]],
-          (errors: Record<string, any>, showErrors: boolean, touches: Record<string, boolean>) =>
+          (s) => [s[`${formKey}AllErrors`], s[`show${capitalizedFormKey}Errors`], s[`${formKey}Touches`]],
+          (allErrors: Record<string, any>, showErrors: boolean, touches: Record<string, boolean>) =>
             showErrors
-              ? errors
+              ? allErrors
               : showErrorsOnTouch
-              ? Object.fromEntries(Object.entries(errors).filter(([key]) => touches[key]))
+              ? Object.fromEntries(Object.entries(allErrors).filter(([key]) => touches[key]))
               : {},
         ],
         [`is${capitalizedFormKey}Valid`]: [
@@ -117,12 +140,15 @@ export function forms<L extends Logic = Logic>(
         ],
       })(logic)
       listeners(({ actions, values }) => ({
-        [`submit${capitalizedFormKey}`]: () => {
+        [`submit${capitalizedFormKey}`]: async (_, breakpoint) => {
+          if (formObject.preSubmit) {
+            await formObject.preSubmit?.(values[formKey], breakpoint)
+          }
           const canSubmit = !values[`${formKey}HasErrors`]
           if (canSubmit) {
             actions[`submit${capitalizedFormKey}Request`](values[formKey])
           } else {
-            actions[`submit${capitalizedFormKey}Failure`](new Error('Validation error'))
+            actions[`submit${capitalizedFormKey}Failure`](new Error('Validation Failed'), values.allErrors)
           }
         },
         [`submit${capitalizedFormKey}Request`]: async (
@@ -134,7 +160,7 @@ export function forms<L extends Logic = Logic>(
             actions[`submit${capitalizedFormKey}Success`](typeof newValues !== 'undefined' ? newValues : formValues)
           } catch (error: any) {
             if (!isBreakpoint(error)) {
-              actions[`submit${capitalizedFormKey}Failure`](error)
+              actions[`submit${capitalizedFormKey}Failure`](error, values.allErrors)
             }
           }
         },

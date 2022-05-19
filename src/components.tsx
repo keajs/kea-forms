@@ -25,6 +25,7 @@ export interface ChildFunctionProps {
   onChangeEvent: (event: ChangeEvent) => void
   onChange: (value: any) => void
   value: any
+  error?: any
   id: string
   name: FieldNamePath | FieldNameType
 }
@@ -114,6 +115,7 @@ export function Field({ name, label, hint, noStyle, children, template }: FieldP
     id,
     name,
     value,
+    error,
     onBlur: () => {
       touchField(nameString)
     },

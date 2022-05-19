@@ -8,6 +8,7 @@ export interface FormOptions {
 export interface FormInput<L extends Logic, T extends Record<string, any> = Record<string, any>> {
   defaults?: T
   errors?: ((formValues: T) => DeepPartialMap<T, ValidationErrorType>) | SelectorDefinition<L['selectors'], any>
+  preSubmit?: (formValues: T, breakpoint: BreakPointFunction) => void | Promise<void> | T | Promise<T>
   submit?: (formValues: T, breakpoint: BreakPointFunction) => void | Promise<void> | T | Promise<T>
   options?: Partial<FormOptions>
 }

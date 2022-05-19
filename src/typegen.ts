@@ -131,6 +131,26 @@ export function forms({ parsedLogic, node, getTypeNodeForNode, prepareForPrint }
     )
     createAction(
       parsedLogic,
+      `set${capitalizedFormKey}ManualErrors`,
+      [
+        // (errors: Partial<FormValueType>)
+        factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          undefined,
+          factory.createIdentifier('errors'),
+          undefined,
+          recordStringAny(),
+          undefined,
+        ),
+      ],
+      // { values: Partial<FormValueType> }
+      factory.createTypeLiteralNode([
+        factory.createPropertySignature(undefined, factory.createIdentifier('errors'), undefined, recordStringAny()),
+      ]),
+    )
+    createAction(
+      parsedLogic,
       `touch${capitalizedFormKey}Field`,
       [
         factory.createParameterDeclaration(
@@ -217,7 +237,7 @@ export function forms({ parsedLogic, node, getTypeNodeForNode, prepareForPrint }
       parsedLogic,
       `submit${capitalizedFormKey}Failure`,
       [
-        // params = (error: Error) => void
+        // params = (error: Error, errors: Record<string, any>) => void
         factory.createParameterDeclaration(
           undefined,
           undefined,
@@ -225,6 +245,15 @@ export function forms({ parsedLogic, node, getTypeNodeForNode, prepareForPrint }
           factory.createIdentifier('error'),
           undefined,
           factory.createTypeReferenceNode(factory.createIdentifier('Error'), undefined),
+          undefined,
+        ),
+        factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          undefined,
+          factory.createIdentifier('errors'),
+          undefined,
+          recordStringAny(),
           undefined,
         ),
       ],
@@ -236,6 +265,7 @@ export function forms({ parsedLogic, node, getTypeNodeForNode, prepareForPrint }
           undefined,
           factory.createTypeReferenceNode(factory.createIdentifier('Error'), undefined),
         ),
+        factory.createPropertySignature(undefined, factory.createIdentifier('errors'), undefined, recordStringAny()),
       ]),
     )
 
@@ -244,9 +274,11 @@ export function forms({ parsedLogic, node, getTypeNodeForNode, prepareForPrint }
     createReducer(parsedLogic, `show${capitalizedFormKey}Errors`, bool())
     createReducer(parsedLogic, `${formKey}Changed`, bool())
     createReducer(parsedLogic, `${formKey}Touches`, record(string(), bool()))
+    createReducer(parsedLogic, `${formKey}ManualErrors`, recordStringAny())
 
     createSelector(parsedLogic, `${formKey}Touched`, bool())
     createSelector(parsedLogic, `${formKey}ValidationErrors`, deepPartialMap(typeNode, validationErrorType()))
+    createSelector(parsedLogic, `${formKey}AllErrors`, recordStringAny())
     createSelector(parsedLogic, `${formKey}HasErrors`, bool())
     createSelector(parsedLogic, `${formKey}Errors`, deepPartialMap(typeNode, validationErrorType()))
     createSelector(parsedLogic, `is${capitalizedFormKey}Valid`, bool())

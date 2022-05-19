@@ -28,9 +28,11 @@ describe('kea-forms plugin', () => {
       'isPluginDrawerSubmitting',
       'isPluginDrawerValid',
       'pluginDrawer',
+      'pluginDrawerAllErrors',
       'pluginDrawerChanged',
       'pluginDrawerErrors',
       'pluginDrawerHasErrors',
+      'pluginDrawerManualErrors',
       'pluginDrawerTouched',
       'pluginDrawerTouches',
       'pluginDrawerValidationErrors',
@@ -38,6 +40,7 @@ describe('kea-forms plugin', () => {
     ])
     expect(Object.keys(logic.actions).sort()).toEqual([
       'resetPluginDrawer',
+      'setPluginDrawerManualErrors',
       'setPluginDrawerValue',
       'setPluginDrawerValues',
       'submitPluginDrawer',
@@ -78,7 +81,7 @@ describe('kea-forms plugin', () => {
     unmount()
   })
 
-  test('errors sync', async () => {
+  test('validation errors', async () => {
     const logic = kea({
       forms: {
         pluginDrawer: {

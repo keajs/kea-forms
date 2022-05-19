@@ -1,9 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-As we're at the 0.x phase, deprecations and breaking changes will still happen. They will be documented here.
+## 3.0.1
+- Add values `${form}ManualErrors`, `${form}AllErrors` 
+- Add actions `set${from}ManualErrors`
+- Add `preSubmit` that can be used to get/set errors. `submit` will only be called if there are no errors in `allError`
+- Add `errors` to `submit${form}Failure` 
 
-Once we react 1.0 all deprecations will be removed and the project will switch to SemVer.
+## 3.0.0 
+- Kea 3.0.0 support
 
 ## 0.2.0 - 2021-07-15
 - Support nested form fields
