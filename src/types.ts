@@ -1,5 +1,5 @@
 // TDDO: use the one from Kea directly
-import { BreakPointFunction, Logic, SelectorDefinition } from 'kea'
+import { BreakPointFunction, Logic, LogicPropSelectors, SelectorDefinition } from 'kea'
 
 export interface FormOptions {
   showErrorsOnTouch: boolean
@@ -7,7 +7,9 @@ export interface FormOptions {
 
 export interface FormInput<L extends Logic, T extends Record<string, any> = Record<string, any>> {
   defaults?: T
-  errors?: ((formValues: T) => DeepPartialMap<T, ValidationErrorType>) | SelectorDefinition<L['selectors'], any>
+  errors?:
+    | ((formValues: T) => DeepPartialMap<T, ValidationErrorType>)
+    | SelectorDefinition<L['selectors'], LogicPropSelectors<L>, any>
   preSubmit?: (formValues: T, breakpoint: BreakPointFunction) => void | Promise<void> | T | Promise<T>
   submit?: (formValues: T, breakpoint: BreakPointFunction) => void | Promise<void> | T | Promise<T>
   options?: Partial<FormOptions>

@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 3.0.2
+- Fix typing bug when using with Kea 3.0 non-alpha versions. Thanks @jacobwgillespie
+
 ## 3.0.1
 - Add values `${form}ManualErrors`, `${form}AllErrors` 
 - Add actions `set${from}ManualErrors`
