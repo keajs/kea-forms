@@ -34,7 +34,7 @@ export function forms<L extends Logic = Logic>(
         [`submit${capitalizedFormKey}Request`]: (formValues: Record<string, any>) => ({ [formKey]: formValues }),
         [`submit${capitalizedFormKey}Success`]: (formValues: Record<string, any>) => ({ [formKey]: formValues }),
         [`submit${capitalizedFormKey}Failure`]: (error: Error, errors: Record<string, any>) => ({ error, errors }),
-      })(logic)
+      } as any)(logic)
 
       if (formInput.defaults) {
         defaults({
@@ -95,7 +95,7 @@ export function forms<L extends Logic = Logic>(
           {} as Record<string, any>,
           {
             [`reset${capitalizedFormKey}`]: () => ({}),
-            [`set${capitalizedFormKey}ManualErrors`]: (_, { errors }: { errors: Record<string, any> }) => errors,
+            [`set${capitalizedFormKey}ManualErrors`]: (_: any, { errors }: { errors: Record<string, any> }) => errors,
             [`touch${capitalizedFormKey}Field`]: (state: Record<string, any>, { key }: { key: string }) => {
               if (key in state) {
                 const { [key]: _discard, ...rest } = state
@@ -139,8 +139,8 @@ export function forms<L extends Logic = Logic>(
           (errors: Record<string, any>) => !hasErrors(errors),
         ],
       })(logic)
-      listeners(({ actions, values }) => ({
-        [`submit${capitalizedFormKey}`]: async (_, breakpoint) => {
+      listeners(({ actions, values }: any) => ({
+        [`submit${capitalizedFormKey}`]: async (_: any, breakpoint: any) => {
           if (formInput.preSubmit) {
             await formInput.preSubmit?.(values[formKey], breakpoint)
           }
