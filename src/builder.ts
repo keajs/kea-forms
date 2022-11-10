@@ -1,4 +1,4 @@
-import { FieldName, FormDefinitions } from './types'
+import { FieldName, FormDefinitions, FormInput } from './types'
 import {
   BreakPointFunction,
   BuiltLogic,
@@ -17,10 +17,10 @@ export function forms<L extends Logic = Logic>(
   input: FormDefinitions<L> | ((logic: BuiltLogic<L>) => FormDefinitions<L>),
 ): LogicBuilder<L> {
   return (logic) => {
-    const forms = typeof input === 'function' ? input(logic) : input
+    const forms: FormDefinitions<L> = typeof input === 'function' ? input(logic) : input
 
-    for (const [formKey, formObject] of Object.entries(forms)) {
-      const { showErrorsOnTouch } = formObject.options || {}
+    for (const [formKey, formInput] of Object.entries(forms) as [string, FormInput<L>][]) {
+      const { showErrorsOnTouch, alwaysShowErrors } = formInput.options || {}
       const capitalizedFormKey = capitalizeFirstLetter(formKey)
 
       actions({
@@ -36,9 +36,9 @@ export function forms<L extends Logic = Logic>(
         [`submit${capitalizedFormKey}Failure`]: (error: Error, errors: Record<string, any>) => ({ error, errors }),
       })(logic)
 
-      if (formObject.defaults) {
+      if (formInput.defaults) {
         defaults({
-          [formKey]: formObject.defaults,
+          [formKey]: formInput.defaults,
         })(logic)
       }
 
@@ -53,7 +53,7 @@ export function forms<L extends Logic = Logic>(
             { values }: { values: Record<string, any> },
           ) => ({ ...state, ...values }),
           [`reset${capitalizedFormKey}`]: (state: Record<string, any>, { values }: { values: Record<string, any> }) =>
-            values || formObject.defaults || {},
+            values || formInput.defaults || {},
         },
 
         [`is${capitalizedFormKey}Submitting`]: [
@@ -111,9 +111,9 @@ export function forms<L extends Logic = Logic>(
           (s) => [s[`${formKey}Touches`]],
           (touches: Record<string, any>) => Object.keys(touches).length > 0,
         ],
-        [`${formKey}ValidationErrors`]: Array.isArray(formObject.errors)
-          ? formObject.errors
-          : [(s) => [s[formKey]], formObject.errors || (() => ({}))],
+        [`${formKey}ValidationErrors`]: Array.isArray(formInput.errors)
+          ? formInput.errors
+          : [(s) => [s[formKey]], formInput.errors || (() => ({}))],
         [`${formKey}AllErrors`]: [
           (s) => [s[`${formKey}ValidationErrors`], s[`${formKey}ManualErrors`]],
           (validationErrors: Record<string, any>, manualErrors: Record<string, any>) => ({
@@ -128,7 +128,7 @@ export function forms<L extends Logic = Logic>(
         [`${formKey}Errors`]: [
           (s) => [s[`${formKey}AllErrors`], s[`show${capitalizedFormKey}Errors`], s[`${formKey}Touches`]],
           (allErrors: Record<string, any>, showErrors: boolean, touches: Record<string, boolean>) =>
-            showErrors
+            alwaysShowErrors || showErrors
               ? allErrors
               : showErrorsOnTouch
               ? Object.fromEntries(Object.entries(allErrors).filter(([key]) => touches[key]))
@@ -141,8 +141,8 @@ export function forms<L extends Logic = Logic>(
       })(logic)
       listeners(({ actions, values }) => ({
         [`submit${capitalizedFormKey}`]: async (_, breakpoint) => {
-          if (formObject.preSubmit) {
-            await formObject.preSubmit?.(values[formKey], breakpoint)
+          if (formInput.preSubmit) {
+            await formInput.preSubmit?.(values[formKey], breakpoint)
           }
           const canSubmit = !values[`${formKey}HasErrors`]
           if (canSubmit) {
@@ -156,7 +156,7 @@ export function forms<L extends Logic = Logic>(
           breakpoint: BreakPointFunction,
         ) => {
           try {
-            const newValues = await formObject.submit?.(formValues, breakpoint)
+            const newValues = await formInput.submit?.(formValues, breakpoint)
             actions[`submit${capitalizedFormKey}Success`](typeof newValues !== 'undefined' ? newValues : formValues)
           } catch (error: any) {
             if (!isBreakpoint(error)) {

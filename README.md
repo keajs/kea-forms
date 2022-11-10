@@ -57,9 +57,11 @@ export const formsLogic = kea<formsLogicType<UserFormType>>({
       submit: (formValues) => {
         console.log('submitting!', formValues)
       },
+      showErrorsOnTouch: true,
+      alwaysShowErrors: false,
     },
   },
-    
+
   // ... other listeners, etc
 })
 ```
@@ -77,7 +79,7 @@ interface formsLogicType {
     submitUserFormRequest: (userForm: UserFormType) => void
     submitUserFormSuccess: (userForm: UserFormType) => void
     submitUserFormFailure: (error: Error) => void
-  },
+  }
   values: {
     userForm: UserFormType
     userFormChanges: DeepPartial<UserFormType>
@@ -96,7 +98,6 @@ interface formsLogicType {
 
 Then use the provided `Form` and `Field` helpers inside your component:
 
-
 ```tsx
 import { formsLogic } from './formsLogic'
 import { useActions, useValues } from 'kea'
@@ -106,7 +107,7 @@ function MyForm() {
   const { isUserFormSubmitting } = useValues(formsLogic)
   const { setUserFormValue } = useActions(formsLogic)
 
-  return(
+  return (
     <div>
       <p>Demonstrating a simple form below</p>
       <Form logic={formsLogic} form="userForm">
@@ -115,8 +116,12 @@ function MyForm() {
           <input className="form-input" />
         </Field>
 
-        <button type="button" onClick={() => setUserFormValue('guest', '')}>No Guest</button>
-        <button type="button" onClick={() => setUserFormValue('guest', 'Other Name')}>Other Guest</button>
+        <button type="button" onClick={() => setUserFormValue('guest', '')}>
+          No Guest
+        </button>
+        <button type="button" onClick={() => setUserFormValue('guest', 'Other Name')}>
+          Other Guest
+        </button>
 
         <Field name="subscribe">
           {({ onChange, value }) => (

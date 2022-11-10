@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 3.0.3
+- Add `alwaysShowErrors`
+
 ## 3.0.2
 - Fix typing bug when using with Kea 3.0 non-alpha versions. Thanks @jacobwgillespie
 
