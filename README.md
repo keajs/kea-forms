@@ -32,15 +32,18 @@ resetContext({
 Code like this:
 
 ```ts
+import { kea } from 'kea-forms'
+import { forms } from 'kea-forms'
+
 export interface UserFormType {
   name: string
   email: string
 }
 
-export const formsLogic = kea<formsLogicType<UserFormType>>({
+export const formsLogic = kea<formsLogicType<UserFormType>>([
   // ... actions, reducers, ...
 
-  forms: {
+  forms({
     userForm: {
       defaults: {
         name: '',
@@ -60,10 +63,10 @@ export const formsLogic = kea<formsLogicType<UserFormType>>({
       showErrorsOnTouch: true,
       alwaysShowErrors: false,
     },
-  },
+  }),
 
   // ... other listeners, etc
-})
+])
 ```
 
 Produces the following actions and values:
