@@ -82,14 +82,12 @@ export function forms({ parsedLogic, node, getTypeNodeForNode, prepareForPrint }
         factory.createParameterDeclaration(
           undefined,
           undefined,
-          undefined,
           factory.createIdentifier('key'),
           undefined,
           fieldName(),
           undefined,
         ),
         factory.createParameterDeclaration(
-          undefined,
           undefined,
           undefined,
           factory.createIdentifier('value'),
@@ -110,7 +108,6 @@ export function forms({ parsedLogic, node, getTypeNodeForNode, prepareForPrint }
       [
         // (values: Partial<FormValueType>)
         factory.createParameterDeclaration(
-          undefined,
           undefined,
           undefined,
           factory.createIdentifier('values'),
@@ -137,7 +134,6 @@ export function forms({ parsedLogic, node, getTypeNodeForNode, prepareForPrint }
         factory.createParameterDeclaration(
           undefined,
           undefined,
-          undefined,
           factory.createIdentifier('errors'),
           undefined,
           recordStringAny(),
@@ -156,7 +152,6 @@ export function forms({ parsedLogic, node, getTypeNodeForNode, prepareForPrint }
         factory.createParameterDeclaration(
           undefined,
           undefined,
-          undefined,
           factory.createIdentifier('key'),
           undefined,
           string(),
@@ -173,7 +168,6 @@ export function forms({ parsedLogic, node, getTypeNodeForNode, prepareForPrint }
       [
         // (values: Partial<FormValueType>)
         factory.createParameterDeclaration(
-          undefined,
           undefined,
           undefined,
           factory.createIdentifier('values'),
@@ -201,7 +195,6 @@ export function forms({ parsedLogic, node, getTypeNodeForNode, prepareForPrint }
         factory.createParameterDeclaration(
           undefined,
           undefined,
-          undefined,
           factory.createIdentifier(formKey),
           undefined,
           typeNode,
@@ -219,7 +212,6 @@ export function forms({ parsedLogic, node, getTypeNodeForNode, prepareForPrint }
       [
         // params = ([formKey]: Form) => void
         factory.createParameterDeclaration(
-          undefined,
           undefined,
           undefined,
           factory.createIdentifier(formKey),
@@ -241,14 +233,12 @@ export function forms({ parsedLogic, node, getTypeNodeForNode, prepareForPrint }
         factory.createParameterDeclaration(
           undefined,
           undefined,
-          undefined,
           factory.createIdentifier('error'),
           undefined,
           factory.createTypeReferenceNode(factory.createIdentifier('Error'), undefined),
           undefined,
         ),
         factory.createParameterDeclaration(
-          undefined,
           undefined,
           undefined,
           factory.createIdentifier('errors'),
