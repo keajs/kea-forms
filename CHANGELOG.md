@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 3.1.1
+- Add `canSubmitWithErrors` option
+
 ## 3.1.0
 - TypeScript 5.0+ support without a deprecation message.
 
