@@ -144,7 +144,7 @@ export function forms<L extends Logic = Logic>(
           if (formInput.preSubmit) {
             await formInput.preSubmit?.(values[formKey], breakpoint)
           }
-          const canSubmit = !values[`${formKey}HasErrors`]
+          const canSubmit = !values[`${formKey}HasErrors`] || formInput.options?.canSubmitWithErrors
           if (canSubmit) {
             actions[`submit${capitalizedFormKey}Request`](values[formKey])
           } else {

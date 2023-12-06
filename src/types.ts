@@ -4,6 +4,7 @@ import { BreakPointFunction, Logic, LogicPropSelectors, SelectorDefinition } fro
 export interface FormOptions {
   showErrorsOnTouch: boolean
   alwaysShowErrors: boolean
+  canSubmitWithErrors: boolean
 }
 
 export interface FormInput<L extends Logic, T extends Record<string, any> = Record<string, any>> {
@@ -17,9 +18,11 @@ export interface FormInput<L extends Logic, T extends Record<string, any> = Reco
 }
 
 export type FormDefinitions<L extends Logic> = L['values'] extends Record<string, any>
-  ? Partial<{
-      [K in keyof L['values']]: FormInput<L, L['values'][K]>
-    }>
+  ? Partial<
+      {
+        [K in keyof L['values']]: FormInput<L, L['values'][K]>
+      }
+    >
   : Record<string, FormInput<L>>
 
 export type FieldNameType = string | number
