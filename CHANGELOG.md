@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 3.1.2
+- Support touch-enabled errors for nested fields.
+
 ## 3.1.1
 - Add `canSubmitWithErrors` option
 

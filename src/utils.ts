@@ -73,7 +73,7 @@ export function splitPathKey(key: FieldName): FieldNamePath {
 export function getTouchErrors(errors: Record<string, any>, touches: Record<string, boolean>) {
   const target = {}
 
-  for (const [pathStr, _] of Object.entries(touches)) {
+  for (const pathStr of Object.keys(touches)) {
     const path = pathStr.split('.')
 
     let pathIndex = 0
