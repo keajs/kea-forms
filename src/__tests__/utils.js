@@ -1,5 +1,5 @@
 /* global test, expect, beforeEach */
-import { deepAssign, deepTruthy, hasErrors, pathSelector, splitPathKey } from '../utils'
+import { deepAssign, deepTruthy, hasErrors, pathSelector, splitPathKey, getTouchErrors } from '../utils'
 
 const delay = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms))
 
@@ -94,5 +94,52 @@ describe('utils', () => {
     expect(splitPathKey(3)).toEqual([3])
     expect(splitPathKey('1.2.3')).toEqual(['1', '2', '3'])
     expect(splitPathKey('a.b.3')).toEqual(['a', 'b', '3'])
+  })
+
+  test('getTouchErrors', () => {
+    let allErrors = {
+      name: 'You have to enter a name',
+      description: 'You have to enter a description',
+      params: {
+        feature_flag_variants: [{ key: 'Variant 1 error message' }, { key: 'Variant 2 error message' }],
+      },
+    }
+    let touches = {
+      name: true,
+      'params.feature_flag_variants.0': true,
+    }
+    let expectedTouchErrors = {
+      name: 'You have to enter a name',
+      params: {
+        feature_flag_variants: [{ key: 'Variant 1 error message' }],
+      },
+    }
+    expect(getTouchErrors(allErrors, touches)).toEqual(expectedTouchErrors)
+
+    allErrors = {
+      level0: {
+        level1: {
+          level2a: 'You have to enter a name',
+          level2b: [
+            { key: 'Nested error message 0' },
+            { key: 'Nested error message 1' },
+            { key: 'Nested error message 2' },
+          ],
+        },
+      },
+    }
+    touches = {
+      'level0.level1.level2a': true,
+      'level0.level1.level2b.2': true,
+    }
+    expectedTouchErrors = {
+      level0: {
+        level1: {
+          level2a: 'You have to enter a name',
+          level2b: [undefined, undefined, { key: 'Nested error message 2' }],
+        },
+      },
+    }
+    expect(getTouchErrors(allErrors, touches)).toEqual(expectedTouchErrors)
   })
 })

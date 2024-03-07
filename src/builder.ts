@@ -11,7 +11,7 @@ import {
   selectors,
   listeners,
 } from 'kea'
-import { capitalizeFirstLetter, deepAssign, deepTruthy, hasErrors } from './utils'
+import { capitalizeFirstLetter, deepAssign, deepTruthy, hasErrors, getTouchErrors } from './utils'
 
 export function forms<L extends Logic = Logic>(
   input: FormDefinitions<L> | ((logic: BuiltLogic<L>) => FormDefinitions<L>),
@@ -128,11 +128,7 @@ export function forms<L extends Logic = Logic>(
         [`${formKey}Errors`]: [
           (s) => [s[`${formKey}AllErrors`], s[`show${capitalizedFormKey}Errors`], s[`${formKey}Touches`]],
           (allErrors: Record<string, any>, showErrors: boolean, touches: Record<string, boolean>) =>
-            alwaysShowErrors || showErrors
-              ? allErrors
-              : showErrorsOnTouch
-              ? Object.fromEntries(Object.entries(allErrors).filter(([key]) => touches[key]))
-              : {},
+            alwaysShowErrors || showErrors ? allErrors : showErrorsOnTouch ? getTouchErrors(allErrors, touches) : {},
         ],
         [`is${capitalizedFormKey}Valid`]: [
           (s) => [s[`${formKey}ValidationErrors`]],
