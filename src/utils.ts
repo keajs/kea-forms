@@ -69,3 +69,36 @@ export function splitPathKey(key: FieldName): FieldNamePath {
   }
   return `${key}`.split('.')
 }
+
+export function getTouchErrors(errors: Record<string, any>, touches: Record<string, boolean>) {
+  const target = {}
+
+  for (const [pathStr, _] of Object.entries(touches)) {
+    const path = pathStr.split('.')
+
+    let pathIndex = 0
+    let sourcePointer = errors
+    let targetPointer: any = target
+
+    while (pathIndex < path.length) {
+      let pathElem = path[pathIndex]
+
+      if (!targetPointer.hasOwnProperty(pathElem)) {
+        // End of path, copy the remainder (may be an object like { key: 'Error message' })
+        if (pathIndex === path.length - 1) {
+          targetPointer[pathElem] = JSON.parse(JSON.stringify(sourcePointer[pathElem]))
+        } else if (Array.isArray(sourcePointer[pathElem])) {
+          targetPointer[pathElem] = []
+        } else {
+          targetPointer[pathElem] = {}
+        }
+      }
+
+      targetPointer = targetPointer[pathElem]
+      sourcePointer = sourcePointer[pathElem]
+      pathIndex++
+    }
+  }
+
+  return target
+}
