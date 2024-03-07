@@ -141,5 +141,27 @@ describe('utils', () => {
       },
     }
     expect(getTouchErrors(allErrors, touches)).toEqual(expectedTouchErrors)
+
+    allErrors = {
+      name: 'You have to enter a name',
+      description: undefined,
+      params: {
+        feature_flag_variants: [{ key: undefined }, { key: 'Variant 2 error message' }],
+      },
+    }
+    touches = {
+      name: true,
+      description: true,
+      'params.feature_flag_variants.0': true,
+      'params.feature_flag_variants.1': true,
+    }
+    expectedTouchErrors = {
+      name: 'You have to enter a name',
+      description: undefined,
+      params: {
+        feature_flag_variants: [{ key: undefined }, { key: 'Variant 2 error message' }],
+      },
+    }
+    expect(getTouchErrors(allErrors, touches)).toEqual(expectedTouchErrors)
   })
 })

@@ -86,7 +86,11 @@ export function getTouchErrors(errors: Record<string, any>, touches: Record<stri
       if (!targetPointer.hasOwnProperty(pathElem)) {
         // End of path, copy the remainder (may be an object like { key: 'Error message' })
         if (pathIndex === path.length - 1) {
-          targetPointer[pathElem] = JSON.parse(JSON.stringify(sourcePointer[pathElem]))
+          if (typeof sourcePointer[pathElem] === 'undefined') {
+            targetPointer[pathElem] = undefined
+          } else {
+            targetPointer[pathElem] = JSON.parse(JSON.stringify(sourcePointer[pathElem]))
+          }
         } else if (Array.isArray(sourcePointer[pathElem])) {
           targetPointer[pathElem] = []
         } else {
