@@ -58,7 +58,7 @@ export function pathSelector(path: FieldNamePath, state: any) {
 }
 
 export function splitPathKey(key: FieldName): FieldNamePath {
-  if (Array.isArray(key)) {
+  if (Array .isArray(key)) {
     return key
   }
   if (typeof key === 'number') {
@@ -99,7 +99,7 @@ export function getTouchErrors(errors: Record<string, any>, touches: Record<stri
       }
 
       targetPointer = targetPointer[pathElem]
-      sourcePointer = sourcePointer[pathElem]
+      sourcePointer = sourcePointer?.[pathElem]
       pathIndex++
     }
   }
