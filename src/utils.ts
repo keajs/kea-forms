@@ -21,13 +21,23 @@ export function deepAssign(state: any, key: FieldName, value: any): any {
   const [current, ...nextPath] = path
   if (Array.isArray(state)) {
     const currentNumber = typeof current === 'string' ? parseInt(current) : current
-    return state.map((element, index) => (index === currentNumber ? deepAssign(element, nextPath, value) : element))
+    const newArray = [...state]
+    if (String(currentNumber) !== 'NaN') {
+      newArray[currentNumber] = deepAssign(state?.[currentNumber] ?? {}, nextPath, value)
+    }
+    return newArray
   }
   if (typeof state === 'object' && state !== null) {
-    const currentString = typeof current !== 'string' ? current.toString() : current
+    const currentString = String(current)
     return {
       ...state,
-      [currentString]: deepAssign(state[currentString], nextPath, value),
+      [currentString]: deepAssign(state?.[currentString] ?? {}, nextPath, value)
+    }
+  }
+  if (typeof state === 'undefined' || (typeof state === 'object' && state === null)) {
+    const currentString = String(current)
+    return {
+      [currentString]: deepAssign(state?.[currentString] ?? {}, nextPath, value)
     }
   }
   return state

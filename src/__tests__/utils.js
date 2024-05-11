@@ -26,8 +26,8 @@ describe('utils', () => {
     expect(deepAssign({ a: { b: { c: 123 } } }, 'a.b.c'.split('.'), 234)).toEqual({ a: { b: { c: 234 } } })
     expect(deepAssign({ a: { b: { c: 123 } } }, 'a.b', 234)).toEqual({ a: { b: 234 } })
     expect(deepAssign({ a: { b: { c: 123 } } }, 'a.b'.split('.'), 234)).toEqual({ a: { b: 234 } })
-    expect(deepAssign({ a: { b: { c: 123 } } }, 'a.x.y', 234)).toEqual({ a: { b: { c: 123 } } })
-    expect(deepAssign({ a: { b: { c: 123 } } }, 'a.x.y'.split('.'), 234)).toEqual({ a: { b: { c: 123 } } })
+    expect(deepAssign({ a: { b: { c: 123 } } }, 'a.x.y', 234)).toEqual({ a: { b: { c: 123 }, x: { y: 234 } } })
+    expect(deepAssign({ a: { b: { c: 123 } } }, 'a.x.y'.split('.'), 234)).toEqual({ a: { b: { c: 123 }, x: { y: 234 } } })
     expect(deepAssign({ a: { b: { c: 123 } } }, '', 234)).toEqual(234)
     expect(deepAssign({ a: { b: { c: 123 } } }, [], 234)).toEqual(234)
     expect(deepAssign({ a: { b: { c: 123 } } }, [''], 234)).toEqual(234)
@@ -47,11 +47,13 @@ describe('utils', () => {
     expect(deepAssign({ a: { b: [{ c: 123 }, { c: 234 }] } }, 'a.b.bla', 444)).toEqual({
       a: { b: [{ c: 123 }, { c: 234 }] },
     })
-    expect(deepAssign({ a: { b: [{ c: 123 }, { c: 234 }] } }, 'a.b.100', 444)).toEqual({
-      a: { b: [{ c: 123 }, { c: 234 }] },
+    expect(deepAssign({ a: { b: [{ c: 123 }, { c: 234 }] } }, 'a.b.4', 444)).toEqual({
+      a: { b: [{ c: 123 }, { c: 234 }, undefined, undefined, 444] },
     })
 
     expect(deepAssign([{ c: 123 }, { c: 234 }], '1', 444)).toEqual([{ c: 123 }, 444])
+
+    expect(deepAssign([{ c: 123 }], '1.b.y.c', 444)).toEqual([{ c: 123 }, { b: { y: { c: 444 } } }])
   })
 
   test('deepTruthy', () => {
