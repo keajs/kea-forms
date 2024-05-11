@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 3.1.4 - 3.1.5
+- Better null handling
+
 ## 3.1.3
 - Fix bug from 3.1.2
  
