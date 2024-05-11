@@ -23,7 +23,7 @@ export function deepAssign(state: any, key: FieldName, value: any): any {
     const currentNumber = typeof current === 'string' ? parseInt(current) : current
     return state.map((element, index) => (index === currentNumber ? deepAssign(element, nextPath, value) : element))
   }
-  if (typeof state === 'object') {
+  if (typeof state === 'object' && state !== null) {
     const currentString = typeof current !== 'string' ? current.toString() : current
     return {
       ...state,
