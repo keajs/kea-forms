@@ -1,0 +1,20 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: New version (blank for the next minor)
+        required: false
+        type: string
+permissions:
+  contents: read
+jobs:
+  release:
+    permissions:
+      contents: write
+      id-token: write
+    uses: keajs/kea-typegen/.github/workflows/release.yml@main
+    with:
+      version: ${{ inputs.version }}
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

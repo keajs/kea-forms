@@ -67,4 +67,4 @@ typings/
 
 
 vendor
-
+!typegen/vendor/

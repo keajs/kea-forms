@@ -27,6 +27,18 @@ resetContext({
 })
 ```
 
+## Type generation
+
+This package ships its forms type builder as `lib/typegen.wasm` and registers it through
+`lib/typegen.json`. With the Go engine, form defaults, actions, reducers and selectors are
+inferred in the same process as the other Kea builders. Existing typegen versions and projects
+using the JavaScript visitor can use `lib/typegen.js`.
+
+Contributors can rebuild the portable module with `npm run build:typegen` and run its tests
+with `go test -C typegen ./...`. The v1 SDK is vendored so this build also works before the
+first SDK release reaches Go proxies. To publish, run **Actions → Release** on main. An empty
+version selects the next minor. [Typegen release setup](https://github.com/keajs/kea-typegen/blob/main/docs/releases.md)
+
 ## Usage
 
 Code like this:
