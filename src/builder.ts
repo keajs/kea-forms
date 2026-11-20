@@ -144,7 +144,7 @@ export function forms<L extends Logic = Logic>(
           if (canSubmit) {
             actions[`submit${capitalizedFormKey}Request`](values[formKey])
           } else {
-            actions[`submit${capitalizedFormKey}Failure`](new Error('Validation Failed'), values.allErrors)
+            actions[`submit${capitalizedFormKey}Failure`](new Error('Validation Failed'), values[`${formKey}AllErrors`])
           }
         },
         [`submit${capitalizedFormKey}Request`]: async (
@@ -156,7 +156,7 @@ export function forms<L extends Logic = Logic>(
             actions[`submit${capitalizedFormKey}Success`](typeof newValues !== 'undefined' ? newValues : formValues)
           } catch (error: any) {
             if (!isBreakpoint(error)) {
-              actions[`submit${capitalizedFormKey}Failure`](error, values.allErrors)
+              actions[`submit${capitalizedFormKey}Failure`](error, values[`${formKey}AllErrors`])
             }
           }
         },

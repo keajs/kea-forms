@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 
 ## 3.3.0 - Unreleased
 
+- Include the form’s validation and manual errors in submit failure actions.
+
 - Ship a portable Go visitor for kea-typegen 4.0.0. The Go engine now infers form defaults, actions, reducers, and selectors in the same compiler session as the rest of the logic. Earlier typegen versions can continue using the bundled JavaScript visitor.
 
 ## 3.2.0

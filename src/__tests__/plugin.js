@@ -124,6 +124,35 @@ describe('kea-forms plugin', () => {
     unmount()
   })
 
+  test.each([false, true])('submit failure carries the active form errors (submit throws: %s)', async (throws) => {
+    const failure = jest.fn()
+    const logic = kea({
+      forms: {
+        account: {
+          defaults: { email: '' },
+          errors: () => ({ email: 'Required' }),
+          options: { canSubmitWithErrors: throws },
+          submit: () => { throw new Error('Server error') },
+        },
+        other: { defaults: {}, errors: () => ({ other: 'Wrong form' }) },
+      },
+      listeners: { submitAccountFailure: failure },
+    })
+    const unmount = logic.mount()
+    try {
+      logic.actions.setAccountManualErrors({ password: 'Invalid' })
+      logic.actions.submitAccount()
+      await delay(0)
+      expect(failure.mock.calls[0][0]).toEqual({
+        error: new Error(throws ? 'Server error' : 'Validation Failed'),
+        errors: { email: 'Required', password: 'Invalid' },
+      })
+      expect(logic.values.accountErrors).toEqual({ email: 'Required', password: 'Invalid' })
+    } finally {
+      unmount()
+    }
+  })
+
   test('submit', async () => {
     let submitRan = false
     const logic = kea({
