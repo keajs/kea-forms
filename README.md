@@ -37,7 +37,7 @@ using the JavaScript visitor can use `lib/typegen.js`.
 Contributors can rebuild the portable module with `npm run build:typegen` and run its tests
 with `go test -C typegen ./...`. The v1 SDK is vendored so this build also works before the
 first SDK release reaches Go proxies. To publish, run **Actions → Release** on main. An empty
-version selects the next minor. [Typegen release setup](https://github.com/keajs/kea-typegen/blob/main/docs/releases.md)
+version selects the prepared release or the next minor. [Typegen release setup](https://github.com/keajs/kea-typegen/blob/main/docs/releases.md)
 
 ## Usage
 
