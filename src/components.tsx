@@ -22,6 +22,7 @@ export interface GroupProps {
 }
 
 export interface ChildFunctionProps {
+  onBlur: () => void
   onChangeEvent: (event: ChangeEvent) => void
   onChange: (value: any) => void
   value: any

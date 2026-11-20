@@ -10,7 +10,7 @@ This is an **experimental** plugin adding support for `forms` inside kea logic, 
 
 ## Installation
 
-`kea-forms` requires kea-typegen `1.1.5+` and kea `2.4.5+`.
+`kea-forms` requires kea `3.0.1+`.
 
 ```bash
 yarn add kea-forms
@@ -19,7 +19,7 @@ yarn add kea-forms
 Set it up like all other kea plugins:
 
 ```ts
-import { Provider, resetContext } from 'kea'
+import { resetContext } from 'kea'
 import { formsPlugin } from 'kea-forms'
 
 resetContext({
@@ -34,17 +34,16 @@ This package ships its forms type builder as `lib/typegen.wasm` and registers it
 inferred in the same process as the other Kea builders. Existing typegen versions and projects
 using the JavaScript visitor can use `lib/typegen.js`.
 
-Contributors can rebuild the portable module with `npm run build:typegen` and run its tests
-with `go test -C typegen ./...`. The v1 SDK is vendored so this build also works before the
-first SDK release reaches Go proxies. To publish, run **Actions → Release** on main. An empty
-version selects the prepared release or the next minor. [Typegen release setup](https://github.com/keajs/kea-typegen/blob/main/docs/releases.md)
+Run `flox activate` to use the project's Node, npm, Yarn and Go versions. Run `yarn install --frozen-lockfile` and `npm run build:typegen` to build the module locally, and `go test -C typegen ./...` to test it.
+
+To enable releases, sign into npm as a package maintainer and run `npm run release:setup` once. Complete npm's browser authentication prompt. In **Actions → Release**, select `main` and leave the version blank to publish the prepared release or next minor. [Release guide](https://github.com/keajs/kea-typegen/blob/main/docs/releases.md)
 
 ## Usage
 
 Code like this:
 
 ```ts
-import { kea } from 'kea-forms'
+import { kea } from 'kea'
 import { forms } from 'kea-forms'
 
 export interface UserFormType {
@@ -52,7 +51,7 @@ export interface UserFormType {
   email: string
 }
 
-export const formsLogic = kea<formsLogicType<UserFormType>>([
+export const formsLogic = kea<formsLogicType>([
   // ... actions, reducers, ...
 
   forms({
@@ -72,8 +71,7 @@ export const formsLogic = kea<formsLogicType<UserFormType>>([
       submit: (formValues) => {
         console.log('submitting!', formValues)
       },
-      showErrorsOnTouch: true,
-      alwaysShowErrors: false,
+      options: { showErrorsOnTouch: true },
     },
   }),
 
@@ -93,12 +91,11 @@ interface formsLogicType {
     submitUserForm: () => void
     submitUserFormRequest: (userForm: UserFormType) => void
     submitUserFormSuccess: (userForm: UserFormType) => void
-    submitUserFormFailure: (error: Error) => void
+    submitUserFormFailure: (error: Error, errors: Record<string, any>) => void
   }
   values: {
     userForm: UserFormType
-    userFormChanges: DeepPartial<UserFormType>
-    userFormTouches: DeepPartialMap<UserFormType, boolean>
+    userFormTouches: Record<string, boolean>
     isUserFormSubmitting: boolean
     showUserFormErrors: boolean
     userFormChanged: boolean
@@ -111,7 +108,7 @@ interface formsLogicType {
 }
 ```
 
-Then use the provided `Form` and `Field` helpers inside your component:
+With `options.showErrorsOnTouch`, a field shows its validation error on blur. Set `enableFormOnSubmit` to show all field errors when the HTML form is submitted.
 
 ```tsx
 import { formsLogic } from './formsLogic'
@@ -125,7 +122,7 @@ function MyForm() {
   return (
     <div>
       <p>Demonstrating a simple form below</p>
-      <Form logic={formsLogic} form="userForm">
+      <Form logic={formsLogic} formKey="userForm" enableFormOnSubmit>
         <Field name="name" label="Name">
           {/* "value" and "onChange" added automatically */}
           <input className="form-input" />
