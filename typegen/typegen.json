@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "module": "typegen.wasm",
+  "builders": ["forms"],
+  "globals": ["forms"],
+  "typePaths": [["*", "defaults"]]
+}
